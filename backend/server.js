@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+import postRouter from "./routes/post.routes.js";
 import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
@@ -31,6 +32,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 //userRoutes
 app.use("/api/users", userRouter);
+//postRoutes
+app.use("/api/posts", postRouter);
 
 app.listen(port, () => {
   console.log("server is running on port " + port);
