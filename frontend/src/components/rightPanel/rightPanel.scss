@@ -1,0 +1,14 @@
+@import "../../utils/colors.scss";
+
+.right-panel {
+  border: 1px solid $primary-gray;
+  margin: 0.6rem;
+  padding: 1rem 0.8rem;
+  border-radius: 8px;
+
+  p {
+    padding: 0 0.6rem;
+  }
+
+
+}

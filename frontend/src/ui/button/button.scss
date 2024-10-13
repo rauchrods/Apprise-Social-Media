@@ -1,0 +1,26 @@
+@import "../../utils//colors.scss";
+
+.my-button {
+  background-color: $primary-blue;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invert-btn {
+  background-color: $primary-dark;
+  border: 1px solid $primary-gray;
+  color: $white;
+  &:hover {
+    background-color: $primary-blue;
+    color: $primary-dark;
+  }
+}
+
+.auth-btn {
+  width: 100%;
+}

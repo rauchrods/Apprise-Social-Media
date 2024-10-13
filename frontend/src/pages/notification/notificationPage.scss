@@ -1,0 +1,67 @@
+@import "../../utils/colors.scss";
+
+.notification-page {
+  .header {
+    border-bottom: 1px solid $primary-gray;
+    padding: 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .dropdown-setting {
+      position: relative;
+      svg {
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+      .items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 0;
+        background-color: $primary-gray;
+        width: max-content;
+
+        > span {
+          cursor: pointer;
+          padding: 0.6rem;
+
+          &:hover {
+            background-color: $highlight-gray;
+          }
+        }
+      }
+    }
+  }
+  .notification {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    border-bottom: 1px solid $primary-gray;
+    padding: 0.6rem;
+    column-gap: 0.8rem;
+    cursor: pointer;
+    &:hover {
+      background-color: $highlight-gray;
+    }
+
+    .type {
+      .follow {
+        color: $primary-blue;
+      }
+      .like {
+        color: $error-red;
+      }
+      svg {
+        font-size: 1.6rem;
+      }
+    }
+    .mid-sec {
+      display: flex;
+      flex-direction: column;
+      row-gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+  }
+}

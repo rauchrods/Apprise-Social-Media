@@ -1,0 +1,58 @@
+@import "../../../utils/colors.scss";
+
+.side-bar {
+  // border: 1px solid $primary-gray;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.6rem;
+  height: 98vh;
+  width: max-content;
+
+  .top-sec {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .side-bar-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .side-bar-list-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 600;
+        padding: 0.6rem;
+        border-radius: 10px;
+        cursor: pointer;
+        &:hover {
+          background-color: $highlight-gray;
+        }
+      }
+    }
+  }
+
+  .bottom-sec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 1.2rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    padding: 0.6rem;
+    border-radius: 10px;
+
+    .left-sec {
+      display: flex;
+      column-gap: 0.6rem;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    &:hover {
+      background-color: $highlight-gray;
+    }
+  }
+}

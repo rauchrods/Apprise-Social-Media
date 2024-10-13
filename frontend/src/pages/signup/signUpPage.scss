@@ -1,0 +1,66 @@
+@import "../../utils//colors.scss";
+
+.sign-up-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  gap: 2.5rem;
+
+  .right-sec {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid $primary-gray;
+    border-radius: 8px;
+    padding: 1.2rem 1rem;
+    row-gap: 1.6rem;
+    align-items: center;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      row-gap: 1rem;
+    }
+
+    h1 {
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+  }
+
+  .bottom-navigation {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    row-gap: 0.6rem;
+  }
+
+  .redirect-route {
+    display: flex;
+    column-gap: 6px;
+    font-size: 15px;
+
+    :nth-child(2) {
+      cursor: pointer;
+    }
+  }
+
+  .error-msg {
+    color: $error-red;
+  }
+
+  .redirect-link {
+    color: $primary-blue;
+    cursor: pointer;
+    text-decoration: none;
+  }
+}
+
+@media only screen and (width< 600px) {
+  .sign-up-page {
+    flex-direction: column;
+  }
+}

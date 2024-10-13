@@ -1,0 +1,28 @@
+@import "../../utils/colors.scss";
+
+.custom-input-container {
+  position: relative;
+  width: max-content;
+
+  > span {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+  }
+  .custom-input {
+    outline: none;
+    padding: 0.5rem 1rem;
+    background-color: $primary-dark;
+    border: 1px solid $primary-gray;
+    border-radius: 5px;
+    color: $white;
+    resize: none;
+
+    &:focus {
+      border: 1px solid $secondary-gray;
+    }
+  }
+  .input-with-icon {
+    padding-left: 1.6rem;
+  }
+}

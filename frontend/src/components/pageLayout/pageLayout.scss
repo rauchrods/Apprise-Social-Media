@@ -1,0 +1,11 @@
+@import "../../utils/colors.scss";
+
+.page-layout {
+  border-left: 1px solid $primary-gray;
+  border-right: 1px solid $primary-gray;
+
+  width: 500px;
+  min-width: 500px;
+  height: 100vh;
+  overflow-y: auto;
+}

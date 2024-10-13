@@ -1,0 +1,76 @@
+@import "../../../utils/colors.scss";
+
+.post-container {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid $primary-gray;
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .left-sec {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      .owner-details {
+        display: flex;
+        column-gap: 0.4rem;
+        align-items: center;
+        a:nth-child(1) {
+          font-size: 0.95rem;
+        }
+        a:nth-child(2),
+        span {
+          font-size: 0.8rem;
+          color: $primary-gray;
+        }
+      }
+    }
+
+    svg:hover {
+      cursor: pointer;
+      color: $error-red;
+    }
+  }
+
+  .post-body {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.6rem;
+    .post-text {
+      font-size: 0.95rem;
+    }
+    .post-img-holder {
+      border: 1px solid $primary-gray;
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  .post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    > div {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      svg {
+        font-size: 1.15rem;
+      }
+
+      span {
+        font-size: 0.85rem;
+      }
+
+      .liked {
+        color: $error-red;
+      }
+    }
+  }
+}

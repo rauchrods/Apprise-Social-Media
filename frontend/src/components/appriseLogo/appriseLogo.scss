@@ -1,0 +1,20 @@
+@import "../../utils/colors.scss";
+
+.apprise-logo {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0.2rem 0;
+  border-radius: 5px;
+  padding: 0.4rem 0.6rem;
+
+  h2 {
+    margin: 0;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &:hover {
+    background-color: $highlight-gray;
+  }
+}
