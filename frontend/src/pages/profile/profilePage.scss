@@ -1,0 +1,91 @@
+@import "../../utils/colors.scss";
+
+.profile-page {
+  .header {
+    border-bottom: 1px solid $primary-gray;
+    padding: 0.6rem;
+    display: flex;
+    justify-content: flex-start;
+    column-gap: 1.5rem;
+    align-items: center;
+
+    .header-info {
+      :nth-child(1) {
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+      :nth-child(2) {
+        color: $primary-gray;
+      }
+    }
+  }
+  .profile-img-sec {
+    position: relative;
+    .cover-img-container {
+      position: relative;
+      cursor: pointer;
+
+      > img {
+        width: 100%;
+        object-fit: cover;
+      }
+
+      .edit-cover-svg {
+        display: none;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+        background-color: $primary-gray;
+        border-radius: 50%;
+        padding: 0.2rem;
+
+        svg {
+          font-size: 1.4rem;
+        }
+      }
+
+      &:hover {
+        .edit-cover-svg {
+          display: flex;
+        }
+      }
+    }
+
+    .profile-pic-container {
+      position: absolute;
+      width: max-content;
+      cursor: pointer;
+      bottom: -3rem;
+      left: 1.6rem;
+      .edit-profile-svg {
+        display: none;
+        position: absolute;
+        top: 0.8rem;
+        right: 0.8rem;
+        cursor: pointer;
+        background-color: $primary-gray;
+        border-radius: 50%;
+        padding: 0.2rem;
+
+        svg {
+          font-size: 1rem;
+        }
+      }
+
+      &:hover {
+        .edit-profile-svg {
+          display: flex;
+        }
+      }
+    }
+  }
+
+  .btn-sec {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.8rem;
+    margin-bottom: 2rem;
+  }
+}
