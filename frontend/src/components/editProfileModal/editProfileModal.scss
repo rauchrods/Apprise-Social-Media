@@ -1,0 +1,33 @@
+@import "../../utils/colors.scss";
+
+.my-modal {
+  .header {
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    h3 {
+      margin: 0.4rem 0;
+    }
+    svg{
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+  }
+
+  background-color: $primary-dark;
+  color: $white;
+  padding: 1rem;
+  border-radius: 10px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+
+    .row {
+      display: flex;
+      column-gap: 0.5rem;
+    }
+  }
+}
