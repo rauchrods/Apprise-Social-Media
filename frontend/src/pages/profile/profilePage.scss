@@ -142,4 +142,32 @@
       }
     }
   }
+
+  .option-header {
+    border-bottom: 1px solid $primary-gray;
+
+    display: flex;
+    justify-content: space-evenly;
+
+    > div {
+      width: 50%;
+      padding: 0.6rem;
+      padding-bottom: 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover {
+        background-color: $highlight-gray;
+      }
+      span {
+        padding-bottom: 0.4rem;
+      }
+
+      .selected {
+        border-bottom: 3px solid $primary-blue;
+      }
+    }
+  }
 }

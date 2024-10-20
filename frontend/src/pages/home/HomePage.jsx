@@ -11,19 +11,17 @@ const HomePage = () => {
     <PageLayout>
       <div className="home-page">
         {/* Header */}
-        <div className="header">
-          <span
-            onClick={() => setFeedType("forYou")}
-            className={feedType === "forYou" ? "selected" : ""}
-          >
-            For you
-          </span>
-          <span
-            onClick={() => setFeedType("following")}
-            className={feedType === "following" ? "selected" : ""}
-          >
-            Following
-          </span>
+        <div className="option-header">
+          <div onClick={() => setFeedType("forYou")}>
+            <span className={feedType === "forYou" ? "selected" : ""}>
+              For you
+            </span>
+          </div>
+          <div onClick={() => setFeedType("following")}>
+            <span className={feedType === "following" ? "selected" : ""}>
+              Following
+            </span>
+          </div>
         </div>
 
         {/*  CREATE POST INPUT */}
