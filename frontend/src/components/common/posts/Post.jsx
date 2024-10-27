@@ -7,20 +7,55 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/avatar/Avatar";
 import "./post.scss";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../loadingSpinner/LoadingSpinner";
 
 const Post = ({ post }) => {
+  const queryClient = useQueryClient();
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+  });
+
+  const { mutate: deletePost, isPending } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/delete/${post._id}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Post deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
+
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const postOwner = post.user;
   const isLiked = true;
 
-  const isMyPost = true;
+  const isMyPost = authUser._id === post.user._id;
 
   const formattedDate = "1h";
 
   const isCommenting = false;
 
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    deletePost();
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -50,10 +85,16 @@ const Post = ({ post }) => {
         </div>
 
         {isMyPost && (
-          <FaTrash
-            className="cursor-pointer hover:text-red-500"
-            onClick={handleDeletePost}
-          />
+          <>
+            {!isPending && (
+              <FaTrash
+                className="cursor-pointer hover:text-red-500"
+                onClick={handleDeletePost}
+              />
+            )}
+
+            {isPending && <LoadingSpinner size={22} />}
+          </>
         )}
       </div>
 

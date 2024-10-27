@@ -87,21 +87,19 @@ const Sidebar = () => {
           ))}
         </div>
       </div>
-      {data && (
+      {authUser && (
         <div className="bottom-sec">
           <div
             className="left-sec"
             onClick={() => navigate(`/profile/${authUser.userName}`)}
           >
             <Avatar
-              src={data?.profileImg || "/avatar-placeholder.png"}
+              src={authUser?.profileImg || "/avatar-placeholder.png"}
               style={{ width: "40px", height: "40px" }}
             />
-            <div className="hidden md:block">
-              <p className="text-white font-bold text-sm w-20 truncate">
-                {data?.fullName}
-              </p>
-              <p className="text-slate-500 text-sm">@{authUser?.userName}</p>
+            <div className="user-details">
+              <p>{authUser?.fullName}</p>
+              <p>@{authUser?.userName}</p>
             </div>
           </div>
           <div

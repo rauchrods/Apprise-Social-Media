@@ -49,6 +49,14 @@
       column-gap: 0.6rem;
       align-items: center;
       font-size: 0.8rem;
+      .user-details {
+        :nth-child(1) {
+          font-weight: 600;
+        }
+        :nth-child(2) {
+          color: $primary-gray;
+        }
+      }
     }
 
     &:hover {

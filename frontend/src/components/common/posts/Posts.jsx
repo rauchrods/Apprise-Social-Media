@@ -4,6 +4,7 @@ import Post from "./Post";
 import "./posts.scss";
 import PostSkeleton from "./PostSkeleton";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const Posts = ({ feedType }) => {
   const getPostEndpoint = () => {
@@ -38,6 +39,9 @@ const Posts = ({ feedType }) => {
         throw new Error(error);
       }
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
 
   console.log("posts: ", posts);

@@ -1,3 +1,4 @@
+import { postSensitiveData } from "../lib/utils/generateToken.js";
 import Notification from "../models/notification.model.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
@@ -186,7 +187,10 @@ export const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate({ path: "user", select: "-password" })
+      .populate({
+        path: "user",
+        select: postSensitiveData.user,
+      })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
 
     if (posts.length === 0) {
@@ -195,6 +199,7 @@ export const getAllPosts = async (req, res) => {
 
     res.status(200).json({
       posts,
+      size: posts.length,
     });
   } catch (error) {
     console.log(error.message);
@@ -244,6 +249,7 @@ export const getFollowingPosts = async (req, res) => {
       .populate({ path: "comments.user", select: ["-password", "-email"] });
     res.status(200).json({
       posts: followingPosts,
+      size: followingPosts.length,
     });
   } catch (error) {
     console.log(error.message);

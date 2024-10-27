@@ -12,3 +12,17 @@ export const generateTokenAndSetCookie = (userId, res) => {
     secure: process.env.NODE_ENV === "production",
   });
 };
+
+export const postSensitiveData = {
+  user: [
+    "-password",
+    "-email",
+    "-bio",
+    "-coverImage",
+    "-followers",
+    "-following",
+    "-likedPosts",
+    "-createdAt",
+    "-updatedAt",
+  ],
+};
