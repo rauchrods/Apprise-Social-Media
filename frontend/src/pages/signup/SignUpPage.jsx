@@ -7,7 +7,7 @@ import { MdDriveFileRenameOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
-import "./SignUpPage.scss";
+import "./signUpPage.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
