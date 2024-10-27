@@ -243,7 +243,7 @@ export const getFollowingPosts = async (req, res) => {
       .populate({ path: "user", select: "-password" })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
     res.status(200).json({
-      followingPosts,
+      posts: followingPosts,
     });
   } catch (error) {
     console.log(error.message);

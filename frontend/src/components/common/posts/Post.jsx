@@ -35,14 +35,14 @@ const Post = ({ post }) => {
           <Avatar
             src={postOwner.profileImg || "/avatar-placeholder.png"}
             style={{ width: "35px", height: "35px", cursor: "pointer" }}
-            onClick={() => navigate(`/profile/${postOwner.username}`)}
+            onClick={() => navigate(`/profile/${postOwner.userName}`)}
           />
 
           <div className="owner-details">
-            <Link to={`/profile/${postOwner.username}`}>
+            <Link to={`/profile/${postOwner.userName}`}>
               {postOwner.fullName}
             </Link>
-            <Link to={`/profile/${postOwner.username}`}>
+            <Link to={`/profile/${postOwner.userName}`}>
               @{postOwner.username}
             </Link>
             <span>{formattedDate}</span>
