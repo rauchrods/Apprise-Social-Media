@@ -7,6 +7,7 @@ import notificationRouter from "./routes/notification.route.js";
 import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
+import path from "path";
 
 //this is required below for env to work
 dotenv.config();
@@ -20,6 +21,8 @@ cloudinary.config({
 const port = process.env.PORT || 3000;
 
 const app = express();
+
+const _dirname = path.resolve();
 
 //middleware below
 
@@ -47,6 +50,13 @@ app.use("/api/users", userRouter);
 app.use("/api/posts", postRouter);
 //notificationRoutes
 app.use("/api/notifications", notificationRouter);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(_dirname, "/frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(_dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(port, () => {
   console.log("server is running on port " + port);
