@@ -6,6 +6,8 @@ import Avatar from "../../ui/avatar/Avatar";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import "./createPost.scss";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const CreatePost = () => {
   const [text, setText] = useState("");
@@ -13,16 +15,53 @@ const CreatePost = () => {
 
   const imgRef = useRef(null);
 
-  const isPending = false;
-  const isError = false;
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+  });
 
-  const data = {
-    profileImg: "/avatars/boy1.png",
-  };
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: createPost,
+    isPending,
+    isError,
+    error,
+  } = useMutation({
+    mutationFn: async ({ text, img }) => {
+      try {
+        const res = await fetch("/api/posts/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text,
+            image: img,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Post created successfully");
+      setText("");
+      setImg(null);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Post created successfully");
+    createPost({ text, img });
   };
 
   const handleImgChange = (e) => {
@@ -30,21 +69,24 @@ const CreatePost = () => {
     console.log(file);
     if (file) {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
 
       reader.onload = () => {
-        console.log(reader);
+        // console.log(reader);
         setImg(reader.result);
       };
+      reader.readAsDataURL(file);
+
+      // setImg(URL.createObjectURL(file));
     }
   };
 
-  console.log(img);
+  console.log("text: ", text);
+  console.log("image: ", img);
 
   return (
     <div className="create-post-container">
       <Avatar
-        src={data.profileImg || "/avatar-placeholder.png"}
+        src={authUser?.profileImg || "/avatar-placeholder.png"}
         style={{ width: "35px", height: "35px" }}
       />
 
@@ -84,11 +126,14 @@ const CreatePost = () => {
             onChange={handleImgChange}
             accept="image/*"
           />
-          <Button style={{ padding: "6px 12px", borderRadius: "15px" }}>
+          <Button
+            style={{ padding: "6px 12px", borderRadius: "15px" }}
+            disabled={isPending}
+          >
             {isPending ? "Posting..." : "Post"}
           </Button>
         </div>
-        {isError && <div className="text-red-500">Something went wrong</div>}
+        {/* {isError && <div className="text-red-500">Something went wrong</div>} */}
       </form>
     </div>
   );

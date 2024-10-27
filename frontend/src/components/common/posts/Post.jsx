@@ -101,7 +101,7 @@ const Post = ({ post }) => {
       <div className="post-body">
         <span className="post-text">{post.text}</span>
         <div className="post-img-holder">
-          {post.img && <img src={post.img} alt="post-img" />}
+          {post.image && <img src={post.image} alt="post-img" />}
         </div>
 
         <div className="flex justify-between mt-3">

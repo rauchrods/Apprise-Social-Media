@@ -25,9 +25,7 @@ export const createPost = async (req, res) => {
     }
 
     if (image) {
-      const uploadResult = await cloudinary.uploader.upload(image, {
-        public_id: "post-image",
-      });
+      const uploadResult = await cloudinary.uploader.upload(image);
 
       image = uploadResult.secure_url;
     }

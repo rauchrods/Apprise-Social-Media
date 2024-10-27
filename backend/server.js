@@ -24,7 +24,17 @@ const app = express();
 //middleware below
 
 //to parse req.body as json
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "5mb",
+  })
+);
+
+// app.use(
+//   express.urlencoded({
+//     extended: true,
+//   })
+// );
 
 //to parse cookies
 app.use(cookieParser());
