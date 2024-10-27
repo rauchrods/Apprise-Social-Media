@@ -80,9 +80,6 @@ const CreatePost = () => {
     }
   };
 
-  console.log("text: ", text);
-  console.log("image: ", img);
-
   return (
     <div className="create-post-container">
       <Avatar

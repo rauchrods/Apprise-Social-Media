@@ -109,7 +109,9 @@ export const getSuggestedUsers = async (req, res) => {
     const suggestedUsers = filteredUsers.slice(0, 5);
 
     suggestedUsers.forEach((user) => (user.password = null));
-    res.status(200).json(suggestedUsers);
+    res
+      .status(200)
+      .json({ users: suggestedUsers, size: suggestedUsers.length });
   } catch (error) {
     return res.status(500).json({
       error: "Internal server error",

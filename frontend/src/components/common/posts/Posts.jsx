@@ -44,7 +44,7 @@ const Posts = ({ feedType }) => {
     }
   });
 
-  console.log("posts: ", posts);
+  // console.log("posts: ", posts);
 
   useEffect(() => {
     refetch();
