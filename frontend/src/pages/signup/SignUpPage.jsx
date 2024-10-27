@@ -8,26 +8,58 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import "./SignUpPage.scss";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
+    userName: "",
     fullName: "",
     password: "",
   });
 
+  const { mutate, isError, error, isPending } = useMutation({
+    mutationFn: async (formData) => {
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        // if (!res.ok) throw new Error("Something went wrong");
+
+        const data = await res.json();
+
+        if (data?.error) throw new Error(data.error);
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        // toast.error(error.message);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Account created successfully");
+      queryClient.invalidateQueries({queryKey: ["authUser"]});
+    },
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData);
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const isError = false;
 
   return (
     <div className="sign-up-page">
@@ -50,9 +82,9 @@ const SignUpPage = () => {
             inputIcon={<FaUser />}
             type="text"
             placeholder="Username"
-            name="username"
+            name="userName"
             onChange={handleInputChange}
-            value={formData.username}
+            value={formData.userName}
           />
 
           <Input
@@ -73,8 +105,10 @@ const SignUpPage = () => {
             value={formData.password}
           />
 
-          <Button className="auth-btn">{"Sign up"}</Button>
-          {isError && <p className="error-msg">Something went wrong</p>}
+          <Button className="auth-btn" disablesd={isPending}>
+            {isPending ? "Loading" : "Sign up"}
+          </Button>
+          {isError && <p className="error-msg">{error.message}</p>}
         </form>
         <div className="bottom-navigation">
           <p>Already have an account?</p>

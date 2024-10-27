@@ -1,14 +1,15 @@
 import React from "react";
 import "./loadingSpinner.scss";
 
-const LoadingSpinner = ({ size }) => {
+const LoadingSpinner = ({ size, ...props }) => {
   return (
     <span
-      class="loader"
+      className="loader"
       style={{
         width: size,
         height: size,
       }}
+      {...props}
     ></span>
   );
 };

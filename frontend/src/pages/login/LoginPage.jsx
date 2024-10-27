@@ -8,24 +8,53 @@ import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 
 import "./loginPage.scss";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData);
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isError = false;
+  const { mutate, isError, error, isPending } = useMutation({
+    mutationFn: async (formData) => {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await res.json();
+
+        if (data?.error) throw new Error(data.error);
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Logged In successfully");
+      queryClient.invalidateQueries({queryKey: ["authUser"]});
+    },
+  });
 
   return (
     <div className="log-in-page">
@@ -53,8 +82,10 @@ const LoginPage = () => {
             value={formData.password}
           />
 
-          <Button className="auth-btn">{"Login"}</Button>
-          {isError && <p className="error-msg">Something went wrong</p>}
+          <Button className="auth-btn">
+            {isPending ? "Loading" : "Login"}
+          </Button>
+          {isError && <p className="error-msg">{error.message}</p>}
         </form>
         <div className="bottom-navigation">
           <p>Don't have an account?</p>

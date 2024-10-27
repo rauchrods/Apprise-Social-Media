@@ -6,6 +6,8 @@ import { BiLogOut } from "react-icons/bi";
 import AppriseLogo from "../../appriseLogo/AppriseLogo";
 import "./sideBar.scss";
 import Avatar from "../../../ui/avatar/Avatar";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const data = {
   fullName: "John Doe",
@@ -13,26 +15,58 @@ const data = {
   profileImg: "/avatars/boy1.png",
 };
 
-const options = [
-  {
-    name: "Home",
-    icon: <MdHomeFilled size={22} />,
-    path: "/",
-  },
-  {
-    name: "Notifications",
-    icon: <IoNotifications size={22} />,
-    path: "/notifications",
-  },
-  {
-    name: "Profile",
-    icon: <FaUser size={22} />,
-    path: `/profile/${data?.username}`,
-  },
-];
-
 const Sidebar = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch("/api/auth/logout", {
+          method: "POST",
+        });
+        const data = await res.json();
+        console.log("data: ", data);
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+
+        return data;
+      } catch (error) {
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Logged Out successfully");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.message);
+    },
+  });
+
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+  });
+
+  const options = [
+    {
+      name: "Home",
+      icon: <MdHomeFilled size={22} />,
+      path: "/",
+    },
+    {
+      name: "Notifications",
+      icon: <IoNotifications size={22} />,
+      path: "/notifications",
+    },
+    {
+      name: "Profile",
+      icon: <FaUser size={22} />,
+      path: `/profile/${authUser?.userName}`,
+    },
+  ];
 
   return (
     <div className="side-bar">
@@ -54,11 +88,11 @@ const Sidebar = () => {
         </div>
       </div>
       {data && (
-        <div
-          className="bottom-sec"
-          onClick={() => navigate(`/profile/${data.username}`)}
-        >
-          <div className="left-sec">
+        <div className="bottom-sec">
+          <div
+            className="left-sec"
+            onClick={() => navigate(`/profile/${authUser.userName}`)}
+          >
             <Avatar
               src={data?.profileImg || "/avatar-placeholder.png"}
               style={{ width: "40px", height: "40px" }}
@@ -67,10 +101,16 @@ const Sidebar = () => {
               <p className="text-white font-bold text-sm w-20 truncate">
                 {data?.fullName}
               </p>
-              <p className="text-slate-500 text-sm">@{data?.username}</p>
+              <p className="text-slate-500 text-sm">@{authUser?.userName}</p>
             </div>
           </div>
-          <div className="right-sec">
+          <div
+            className="right-sec"
+            onClick={(e) => {
+              e.preventDefault();
+              mutate();
+            }}
+          >
             <BiLogOut size={24} />
           </div>
         </div>
