@@ -16,8 +16,12 @@ const Post = ({ post }) => {
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
   });
+  const [isLiked, SetIsLiked] = useState(() =>
+    post.likes.includes(authUser._id)
+  );
+  const [postLikes, SetPostLikes] = useState(() => post.likes.length);
 
-  const { mutate: deletePost, isPending } = useMutation({
+  const { mutate: deletePost, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch(`/api/posts/delete/${post._id}`, {
@@ -42,10 +46,42 @@ const Post = ({ post }) => {
     },
   });
 
+  const { mutate: likePost, isPending: isLiking } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/like/${post._id}`, {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      if (!isLiked) {
+        toast.success("Post liked successfully");
+        SetPostLikes((postLikes) => postLikes + 1);
+      } else {
+        toast.success("Post unliked successfully");
+        SetPostLikes((postLikes) => postLikes - 1);
+      }
+
+      SetIsLiked((currState) => !currState);
+
+      // queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const postOwner = post.user;
-  const isLiked = true;
 
   const isMyPost = authUser._id === post.user._id;
 
@@ -61,7 +97,12 @@ const Post = ({ post }) => {
     e.preventDefault();
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = () => {
+    if (isLiking) {
+      return;
+    }
+    likePost();
+  };
 
   return (
     <div className="post-container">
@@ -86,14 +127,14 @@ const Post = ({ post }) => {
 
         {isMyPost && (
           <>
-            {!isPending && (
+            {!isDeleting && (
               <FaTrash
                 className="cursor-pointer hover:text-red-500"
                 onClick={handleDeletePost}
               />
             )}
 
-            {isPending && <LoadingSpinner size={22} />}
+            {isDeleting && <LoadingSpinner size={22} />}
           </>
         )}
       </div>
@@ -186,9 +227,14 @@ const Post = ({ post }) => {
           <span>0</span>
         </div>
         <div className="like" onClick={handleLikePost}>
-          <FaRegHeart className={isLiked ? "liked" : ""} />
-
-          <span>{post.likes.length}</span>
+          {isLiking ? (
+            <LoadingSpinner size={20} />
+          ) : (
+            <>
+              <FaRegHeart className={isLiked ? "liked" : ""} />
+              <span>{postLikes}</span>
+            </>
+          )}
         </div>
         <div className="save">
           <FaRegBookmark />
