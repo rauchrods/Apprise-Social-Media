@@ -187,7 +187,7 @@ export const getAllPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
-        select: postSensitiveData.user,
+        select: ["-password", "-email"],
       })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
 
@@ -221,7 +221,8 @@ export const getLikedPosts = async (req, res) => {
       .populate({ path: "user", select: "-password" })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
     res.status(200).json({
-      likedPosts,
+      posts: likedPosts,
+      size: likedPosts.length,
     });
   } catch (error) {
     console.log(error.message);
@@ -273,7 +274,8 @@ export const getUserPosts = async (req, res) => {
       .populate({ path: "user", select: "-password" })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
     res.status(200).json({
-      userPosts,
+      posts: userPosts,
+      size: userPosts.length,
     });
   } catch (error) {
     console.log(error.message);
