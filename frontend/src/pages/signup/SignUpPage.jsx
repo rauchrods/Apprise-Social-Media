@@ -19,9 +19,17 @@ const SignUpPage = () => {
     userName: "",
     fullName: "",
     password: "",
+    otp: "",
   });
 
-  const { mutate, isError, error, isPending } = useMutation({
+  const [otpSent, setOtpSent] = useState(false);
+
+  const {
+    mutate: signUp,
+    isError,
+    error,
+    isPending,
+  } = useMutation({
     mutationFn: async (formData) => {
       try {
         const res = await fetch("/api/auth/signup", {
@@ -32,11 +40,11 @@ const SignUpPage = () => {
           body: JSON.stringify(formData),
         });
 
-        // if (!res.ok) throw new Error("Something went wrong");
-
         const data = await res.json();
 
-        if (data?.error) throw new Error(data.error);
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
 
         return data;
       } catch (error) {
@@ -47,14 +55,53 @@ const SignUpPage = () => {
     },
     onSuccess: (data) => {
       console.log(data);
-      toast.success("Account created successfully");
-      queryClient.invalidateQueries({queryKey: ["authUser"]});
+      toast.success("OTP Sent successfully!");
+      setOtpSent(true);
+      // queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+  });
+
+  const { mutate: validateOtp, isPending: isValidatingOtp } = useMutation({
+    mutationFn: async (formData) => {
+      try {
+        const res = await fetch("/api/auth/validate-signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("User Created Successfully!");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutate(formData);
+
+    if (!otpSent) {
+      signUp(formData);
+    } else {
+      validateOtp(formData);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -69,44 +116,61 @@ const SignUpPage = () => {
       <div className="right-sec">
         <h1 className="text-4xl font-extrabold text-white">Join today.</h1>
         <form className="sign-up-form" onSubmit={handleSubmit}>
-          <Input
-            inputIcon={<MdOutlineMail />}
-            type="email"
-            placeholder="Email"
-            name="email"
-            onChange={handleInputChange}
-            value={formData.email}
-          />
+          {!otpSent ? (
+            <>
+              <Input
+                inputIcon={<MdOutlineMail />}
+                type="email"
+                placeholder="Email"
+                name="email"
+                onChange={handleInputChange}
+                value={formData.email}
+              />
 
-          <Input
-            inputIcon={<FaUser />}
-            type="text"
-            placeholder="Username"
-            name="userName"
-            onChange={handleInputChange}
-            value={formData.userName}
-          />
+              <Input
+                inputIcon={<FaUser />}
+                type="text"
+                placeholder="Username"
+                name="userName"
+                onChange={handleInputChange}
+                value={formData.userName}
+              />
 
-          <Input
-            inputIcon={<MdDriveFileRenameOutline />}
-            type="text"
-            placeholder="Full Name"
-            name="fullName"
-            onChange={handleInputChange}
-            value={formData.fullName}
-          />
+              <Input
+                inputIcon={<MdDriveFileRenameOutline />}
+                type="text"
+                placeholder="Full Name"
+                name="fullName"
+                onChange={handleInputChange}
+                value={formData.fullName}
+              />
 
-          <Input
-            inputIcon={<MdPassword />}
-            type="password"
-            placeholder="Password"
-            name="password"
-            onChange={handleInputChange}
-            value={formData.password}
-          />
+              <Input
+                inputIcon={<MdPassword />}
+                type="password"
+                placeholder="Password"
+                name="password"
+                onChange={handleInputChange}
+                value={formData.password}
+              />
+            </>
+          ) : (
+            <Input
+              inputIcon={<MdPassword />}
+              type="number"
+              placeholder="OTP"
+              name="otp"
+              onChange={handleInputChange}
+              value={formData.otp}
+            />
+          )}
 
-          <Button className="auth-btn" disablesd={isPending}>
-            {isPending ? "Loading" : "Sign up"}
+          <Button className="auth-btn" disabled={isPending || isValidatingOtp}>
+            {isPending || isValidatingOtp
+              ? "Loading"
+              : !otpSent
+              ? "Sign Up"
+              : "Submit Otp"}
           </Button>
           {isError && <p className="error-msg">{error.message}</p>}
         </form>
@@ -117,7 +181,7 @@ const SignUpPage = () => {
             className="invert-btn auth-btn"
             onClick={() => navigate("/login")}
           >
-            Sign in
+            Sign In
           </Button>
         </div>
       </div>

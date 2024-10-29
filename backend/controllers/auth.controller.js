@@ -1,6 +1,9 @@
+import { sendOTPEmail } from "../lib/utils/emailConfig.js";
 import { generateTokenAndSetCookie } from "../lib/utils/generateToken.js";
+import Otp from "../models/otp.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import otpGenerator from "otp-generator";
 
 export const signup = async (req, res) => {
   try {
@@ -22,7 +25,7 @@ export const signup = async (req, res) => {
 
     if (password.length < 6) {
       return res.status(400).json({
-        error: "Passwprd should be at least 6 characters",
+        error: "Password should be at least 6 characters",
       });
     }
 
@@ -40,6 +43,51 @@ export const signup = async (req, res) => {
       });
     }
 
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    await Otp.create({
+      email,
+      otp,
+    });
+
+    const emailSent = await sendOTPEmail(userName, email, otp);
+    if (!emailSent) {
+      return res.status(400).json({ error: "Failed to send OTP" });
+    }
+
+    res.status(200).json({ message: "OTP sent to your email" });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+export const validateOtpSignup = async (req, res) => {
+  try {
+    const { email, otp, userName, fullName, password } = req.body;
+
+    if (!otp || !email || !userName || !fullName || !password) {
+      return res.status(400).json({
+        error: "All fields are required",
+      });
+    }
+
+    const otpDoc = await Otp.findOne({ email }).sort({ createdAt: -1 });
+    if (!otpDoc) {
+      return res.status(400).json({ error: "OTP expired or not found" });
+    }
+
+    // Verify OTP
+    if (otpDoc.otp !== otp) {
+      return res.status(401).json({ error: "Invalid OTP" });
+    }
+
     //hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -49,8 +97,6 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
     });
-
-    // console.log(newUser);
 
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);
