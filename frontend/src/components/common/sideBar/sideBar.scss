@@ -49,12 +49,20 @@
       column-gap: 0.6rem;
       align-items: center;
       font-size: 0.8rem;
+
       .user-details {
+        max-width: 120px;
         :nth-child(1) {
           font-weight: 600;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         :nth-child(2) {
           color: $primary-gray;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }
