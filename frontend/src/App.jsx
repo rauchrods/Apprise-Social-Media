@@ -39,7 +39,7 @@ function App() {
     retry: false,
   });
 
-  // console.log("data:useAuth ", authUser);
+  // console.log("data:authUser ", authUser);
 
   if (isLoading) {
     return (

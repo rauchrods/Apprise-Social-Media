@@ -59,7 +59,7 @@ const Posts = ({ feedType }) => {
           <PostSkeleton />
         </div>
       )}
-      {!isLoading && !isRefetching && posts && posts.posts?.length === 0 && (
+      {!isLoading && !isRefetching && posts && posts.size === 0 && (
         <p className="text-center my-4">No posts in this tab. Switch 👻</p>
       )}
       {!isLoading && !isRefetching && posts && (

@@ -16,8 +16,9 @@ const Post = ({ post }) => {
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
   });
+
   const [isLiked, SetIsLiked] = useState(() =>
-    post.likes.includes(authUser._id)
+    post.likes.includes(authUser?._id)
   );
   const [postLikes, SetPostLikes] = useState(() => post.likes.length);
 
@@ -83,10 +84,11 @@ const Post = ({ post }) => {
   const [comment, setComment] = useState("");
   const postOwner = post.user;
 
-  const isMyPost = authUser._id === post.user._id;
+  const isMyPost = authUser?._id === post.user?._id;
 
-  const formattedDate = "1h";
-
+  const formattedDate = Math.floor(
+    (new Date() - new Date(post.createdAt)) / (1000 * 60 * 60 * 24)
+  );
   const isCommenting = false;
 
   const handleDeletePost = () => {
@@ -119,9 +121,9 @@ const Post = ({ post }) => {
               {postOwner.fullName}
             </Link>
             <Link to={`/profile/${postOwner.userName}`}>
-              @{postOwner.username}
+              @{postOwner.userName}
             </Link>
-            <span>{formattedDate}</span>
+            <span>{formattedDate} Days</span>
           </div>
         </div>
 
@@ -145,9 +147,9 @@ const Post = ({ post }) => {
           {post.image && <img src={post.image} alt="post-img" />}
         </div>
 
-        <div className="flex justify-between mt-3">
+        {/* <div className="flex justify-between mt-3">
           <div className="flex gap-4 items-center w-2/3 justify-between">
-            {/* We're using Modal Component from DaisyUI */}
+            }
             <dialog
               id={`comments_modal${post._id}`}
               className="modal border-none outline-none"
@@ -210,7 +212,7 @@ const Post = ({ post }) => {
               </form>
             </dialog>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="post-footer">
         <div

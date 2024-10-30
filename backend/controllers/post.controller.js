@@ -191,9 +191,9 @@ export const getAllPosts = async (req, res) => {
       })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
 
-    if (posts.length === 0) {
-      return res.status(200).json([]);
-    }
+    // if (posts.length === 0) {
+    //   return res.status(200).json([]);
+    // }
 
     res.status(200).json({
       posts,
