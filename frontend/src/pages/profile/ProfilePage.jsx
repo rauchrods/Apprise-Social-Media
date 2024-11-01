@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 // import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 // import EditProfileModal from "./EditProfileModal";
@@ -15,29 +15,42 @@ import "./profilePage.scss";
 import Avatar from "../../ui/avatar/Avatar";
 import Button from "../../ui/button/Button";
 import EditProfileModal from "../../components/editProfileModal/EditProfileModal";
+import { useQuery } from "@tanstack/react-query";
+import { getUserFormattedDate } from "../../utils/utilFunctions";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
   const [feedType, setFeedType] = useState("posts");
 
+  const { userName } = useParams();
+
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
 
-  const isLoading = false;
-  const isMyProfile = true;
+  const {
+    data: userProfile,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["userProfile"],
+    queryFn: async () => {
+      try {
+        const res = await fetch(`/api/users/profile/${userName}`);
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+  });
 
-  const user = {
-    _id: "1",
-    fullName: "John Doe",
-    username: "johndoe",
-    profileImg: "/avatars/boy2.png",
-    coverImg: "/cover.png",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    link: "https://youtube.com/@asaprogrammer_",
-    following: ["1", "2", "3"],
-    followers: ["1", "2", "3"],
-  };
+  const isMyProfile = true;
 
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
@@ -51,31 +64,35 @@ const ProfilePage = () => {
     }
   };
 
+  useEffect(() => {
+    refetch();
+  }, [userName, refetch]);
+
   return (
     <PageLayout>
       <div className="profile-page">
         {/* HEADER */}
-        {/* {isLoading && <ProfileHeaderSkeleton />} */}
-        {!isLoading && !user && (
+        {/* {(isLoading || isRefetching)&& <ProfileHeaderSkeleton />} */}
+        {!isLoading && !isRefetching && !userProfile && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
 
-        {!isLoading && user && (
+        {!isLoading && !isRefetching && userProfile && (
           <>
             <div className="header">
               <Link to="/">
                 <FaArrowLeft />
               </Link>
               <div className="header-info">
-                <p>{user?.fullName}</p>
-                <span>{POSTS?.length} posts</span>
+                <p>{userProfile?.fullName}</p>
+                {/* <span>{POSTS?.length} posts</span> */}
               </div>
             </div>
             {/* COVER IMG */}
             <div className="profile-img-sec">
               <div className="cover-img-container">
                 <img
-                  src={coverImg || user?.coverImg || "/cover.png"}
+                  src={coverImg || userProfile?.coverImage || "/cover.png"}
                   alt="cover image"
                 />
                 {isMyProfile && (
@@ -104,7 +121,9 @@ const ProfilePage = () => {
               <div className="profile-pic-container">
                 <Avatar
                   src={
-                    profileImg || user?.profileImg || "/avatar-placeholder.png"
+                    profileImg ||
+                    userProfile?.profileImage ||
+                    "/avatar-placeholder.png"
                   }
                   style={{ width: "100px", height: "100px" }}
                 />
@@ -140,36 +159,38 @@ const ProfilePage = () => {
 
             <div className="profile-details">
               <div className="main-details">
-                <span className="full-name">{user?.fullName}</span>
-                <span className="user-name">@{user?.username}</span>
-                <span className="bio">{user?.bio}</span>
+                <span className="full-name">{userProfile?.fullName}</span>
+                <span className="user-name">@{userProfile?.userName}</span>
+                <span className="bio">{userProfile?.bio}</span>
               </div>
 
               <div className="link-join-date">
-                {user?.link && (
+                {userProfile?.link && (
                   <div className="link-sec">
                     <FaLink />
                     <a
-                      href="https://youtube.com/@asaprogrammer_"
+                      href={userProfile?.link}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      youtube.com/@asaprogrammer_
+                      {userProfile?.link}
                     </a>
                   </div>
                 )}
                 <div className="join-date-sec">
                   <IoCalendarOutline />
-                  <span>Joined July 2021</span>
+                  <span>
+                    Joined {getUserFormattedDate(userProfile?.createdAt)}
+                  </span>
                 </div>
               </div>
               <div className="follow-following-sec">
                 <div className="following-sec">
-                  <span>{user?.following.length}</span>
+                  <span>{userProfile?.following.length}</span>
                   <span>Following</span>
                 </div>
                 <div className="followers-sec">
-                  <span>{user?.followers.length}</span>
+                  <span>{userProfile?.followers.length}</span>
                   <span>Followers</span>
                 </div>
               </div>
@@ -180,16 +201,16 @@ const ProfilePage = () => {
                   Posts
                 </span>
               </div>
-              <div onClick={() => setFeedType("likes")}>
-                <span className={feedType === "likes" ? "selected" : ""}>
-                  Likes
+              <div onClick={() => setFeedType("liked")}>
+                <span className={feedType === "liked" ? "selected" : ""}>
+                  Liked
                 </span>
               </div>
             </div>
           </>
         )}
 
-        <Posts />
+        <Posts feedType={feedType}/>
       </div>
     </PageLayout>
   );

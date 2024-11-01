@@ -209,8 +209,8 @@ export const getAllPosts = async (req, res) => {
 
 export const getLikedPosts = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
+    const {userName} = req.params;
+    const user = await User.findOne({userName});
     if (!user) {
       return res.status(404).json({
         error: "User not found",
@@ -260,7 +260,7 @@ export const getFollowingPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
-    const userName = req.params.username;
+    const {userName} = req.params;
 
     const user = await User.findOne({ userName }).select("-password");
     if (!user) {

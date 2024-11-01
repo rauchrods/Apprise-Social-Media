@@ -27,3 +27,12 @@ export const getPostFormattedDate = (createdAt) => {
   const years = Math.floor(timeDiff / (1000 * 60 * 60 * 24 * 365));
   return `${years} y`;
 };
+
+
+export const getUserFormattedDate = (createdAt) => {
+  const postDate = new Date(createdAt);
+  return postDate.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}

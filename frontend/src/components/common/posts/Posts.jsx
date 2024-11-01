@@ -5,14 +5,21 @@ import "./posts.scss";
 import PostSkeleton from "./PostSkeleton";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const Posts = ({ feedType }) => {
+
+  const {userName} = useParams();
   const getPostEndpoint = () => {
     switch (feedType) {
       case "forYou":
         return "/api/posts/all";
       case "following":
         return "/api/posts/following";
+      case "posts":
+        return `/api/posts/user/${userName}`;
+        case "liked":
+        return `/api/posts/liked/${userName}`;
       default:
         return "/api/posts/all";
     }
@@ -48,7 +55,7 @@ const Posts = ({ feedType }) => {
 
   useEffect(() => {
     refetch();
-  }, [feedType, refetch]);
+  }, [feedType, refetch, userName]);
 
   return (
     <>
@@ -60,7 +67,7 @@ const Posts = ({ feedType }) => {
         </div>
       )}
       {!isLoading && !isRefetching && posts && posts.size === 0 && (
-        <p className="text-center my-4">No posts in this tab. Switch 👻</p>
+        <p className="no-posts">No posts in this tab. Switch 👻</p>
       )}
       {!isLoading && !isRefetching && posts && (
         <div className="display-posts">

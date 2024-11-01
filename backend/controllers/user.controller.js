@@ -181,9 +181,7 @@ export const updateUserProfile = async (req, res) => {
           user.profileImage.split("/").pop().split(".")[0]
         );
       }
-      const uploadResult = await cloudinary.uploader.upload(profileImage, {
-        public_id: "profile-image",
-      });
+      const uploadResult = await cloudinary.uploader.upload(profileImage);
 
       profileImage = uploadResult.secure_url;
     }

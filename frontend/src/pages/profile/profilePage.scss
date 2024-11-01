@@ -9,6 +9,11 @@
     column-gap: 1.5rem;
     align-items: center;
 
+    a {
+      display: flex;
+      align-items: center;
+    }
+
     .header-info {
       :nth-child(1) {
         font-size: 1.4rem;
