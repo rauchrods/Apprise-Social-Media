@@ -10,12 +10,15 @@ import "./post.scss";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../loadingSpinner/LoadingSpinner";
+import { getPostFormattedDate } from "../../../utils/utilFunctions";
 
 const Post = ({ post }) => {
   const queryClient = useQueryClient();
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
   });
+
+  // console.log("authUser: ", authUser);
 
   const [isLiked, SetIsLiked] = useState(() =>
     post.likes.includes(authUser?._id)
@@ -86,9 +89,7 @@ const Post = ({ post }) => {
 
   const isMyPost = authUser?._id === post.user?._id;
 
-  const formattedDate = Math.floor(
-    (new Date() - new Date(post.createdAt)) / (1000 * 60 * 60 * 24)
-  );
+  const formattedDate = getPostFormattedDate(post.createdAt);
   const isCommenting = false;
 
   const handleDeletePost = () => {
@@ -111,19 +112,22 @@ const Post = ({ post }) => {
       <div className="post-header">
         <div className="left-sec">
           <Avatar
-            src={postOwner.profileImg || "/avatar-placeholder.png"}
+            src={postOwner.profileImage || "/avatar-placeholder.png"}
             style={{ width: "35px", height: "35px", cursor: "pointer" }}
             onClick={() => navigate(`/profile/${postOwner.userName}`)}
           />
 
           <div className="owner-details">
-            <Link to={`/profile/${postOwner.userName}`}>
-              {postOwner.fullName}
-            </Link>
-            <Link to={`/profile/${postOwner.userName}`}>
-              @{postOwner.userName}
-            </Link>
-            <span>{formattedDate} Days</span>
+            <span>
+              <Link to={`/profile/${postOwner.userName}`}>
+                {postOwner.fullName}
+              </Link>
+              <Link to={`/profile/${postOwner.userName}`}>
+                @{postOwner.userName}
+              </Link>
+            </span>
+
+            <span>{formattedDate}</span>
           </div>
         </div>
 

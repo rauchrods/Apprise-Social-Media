@@ -14,13 +14,21 @@
       gap: 0.6rem;
       .owner-details {
         display: flex;
-        column-gap: 0.4rem;
-        align-items: center;
-        a:nth-child(1) {
-          font-size: 0.95rem;
+        flex-direction: column;
+        span:nth-child(1) {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+
+          a:nth-child(1) {
+            font-size: 0.95rem;
+          }
+          a:nth-child(2) {
+            font-size: 0.8rem;
+            color: $primary-gray;
+          }
         }
-        a:nth-child(2),
-        span {
+        span:nth-child(2) {
           font-size: 0.8rem;
           color: $primary-gray;
         }

@@ -12,6 +12,7 @@ export const getAllNotifications = async (req, res) => {
     await Notification.updateMany({ to: userId }, { read: true });
     res.status(200).json({
       notifications,
+      size: notifications.length,
     });
   } catch (error) {
     console.log(error.message);
