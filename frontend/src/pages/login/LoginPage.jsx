@@ -10,6 +10,7 @@ import Button from "../../ui/button/Button";
 import "./loginPage.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import Credit from "../../ui/credit/Credit";
 
 const LoginPage = () => {
   const queryClient = useQueryClient();
@@ -52,7 +53,7 @@ const LoginPage = () => {
     onSuccess: (data) => {
       console.log(data);
       toast.success("Logged In successfully");
-      queryClient.invalidateQueries({queryKey: ["authUser"]});
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 
@@ -63,7 +64,11 @@ const LoginPage = () => {
       </div>
       <div className="right-sec">
         <h1>Lets go.</h1>
-        <form className="log-in-form" onSubmit={handleSubmit}>
+        <form
+          className="log-in-form"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+        >
           <Input
             inputIcon={<MdOutlineMail />}
             type="email"
@@ -97,6 +102,7 @@ const LoginPage = () => {
             Sign up
           </Button>
         </div>
+        <Credit style={{ fontSize: "15px" }} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import Sidebar from "./components/common/sideBar/SideBar";
 import RightPanel from "./components/rightPanel/RightPanel";
 import NotificationPage from "./pages/notification/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/loadingSpinner/LoadingSpinner";
 
@@ -35,6 +35,9 @@ function App() {
       } catch (error) {
         throw new Error(error);
       }
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
     retry: false,
   });

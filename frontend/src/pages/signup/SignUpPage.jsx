@@ -10,6 +10,7 @@ import Button from "../../ui/button/Button";
 import "./signUpPage.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import Credit from "../../ui/credit/Credit";
 
 const SignUpPage = () => {
   const queryClient = useQueryClient();
@@ -184,6 +185,7 @@ const SignUpPage = () => {
             Sign In
           </Button>
         </div>
+        <Credit style={{ fontSize: "15px" }} />
       </div>
     </div>
   );
