@@ -23,7 +23,7 @@ function App() {
       try {
         const res = await fetch("/api/auth/me");
         const data = await res.json();
-        if (data.error) {
+        if (data?.error) {
           return null;
         }
         // console.log("Auth User: ", data);
