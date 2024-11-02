@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-
-// import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
-// import EditProfileModal from "./EditProfileModal";
-
+import { MdVerified } from "react-icons/md";
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
@@ -15,8 +12,12 @@ import "./profilePage.scss";
 import Avatar from "../../ui/avatar/Avatar";
 import Button from "../../ui/button/Button";
 import EditProfileModal from "../../components/editProfileModal/EditProfileModal";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUserFormattedDate } from "../../utils/utilFunctions";
+import useFollow from "../../hooks/useFollow";
+import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinner";
+import toast from "react-hot-toast";
+import ProfileHeaderSkeleton from "./ProfileHeaderSkeleton";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
@@ -27,6 +28,10 @@ const ProfilePage = () => {
 
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
+
+  const { followUnfollow, isPending } = useFollow();
+
+  const queryClient = useQueryClient();
 
   const {
     data: userProfile,
@@ -50,7 +55,49 @@ const ProfilePage = () => {
     },
   });
 
-  const isMyProfile = true;
+  const { mutate: editProfileImage, isPending: isEditImagePending } =
+    useMutation({
+      mutationFn: async () => {
+        try {
+          const res = await fetch(`/api/users/update`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              coverImage: coverImg,
+              profileImage: profileImg,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data?.error || "Something went wrong");
+          }
+          return data;
+        } catch (error) {
+          throw new Error(error);
+        }
+      },
+      onSuccess: () => {
+        toast.success("Profile updated successfully");
+        Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+          queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+        ]);
+        setCoverImg(null);
+        setProfileImg(null);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+
+  // console.log("userProfile: ", userProfile);
+
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+
+  const isMyProfile = authUser?._id === userProfile?._id;
+  
 
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
@@ -72,12 +119,14 @@ const ProfilePage = () => {
     <PageLayout>
       <div className="profile-page">
         {/* HEADER */}
-        {/* {(isLoading || isRefetching)&& <ProfileHeaderSkeleton />} */}
-        {!isLoading && !isRefetching && !userProfile && (
+        {(isLoading || isRefetching || isEditImagePending) && (
+          <ProfileHeaderSkeleton />
+        )}
+        {!isLoading && !isRefetching && !isEditImagePending && !userProfile && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
 
-        {!isLoading && !isRefetching && userProfile && (
+        {!isLoading && !isRefetching && !isEditImagePending && userProfile && (
           <>
             <div className="header">
               <Link to="/">
@@ -95,7 +144,7 @@ const ProfilePage = () => {
                   src={coverImg || userProfile?.coverImage || "/cover.png"}
                   alt="cover image"
                 />
-                {isMyProfile && (
+                {(isMyProfile) && (
                   <div className="edit-cover-svg">
                     <MdEdit onClick={() => coverImgRef.current.click()} />
                   </div>
@@ -141,25 +190,34 @@ const ProfilePage = () => {
               {isMyProfile && <EditProfileModal />}
               {!isMyProfile && (
                 <Button
-                  onClick={() => alert("Followed successfully")}
+                  onClick={() => followUnfollow({ id: userProfile?._id })}
                   className="invert-btn"
                 >
-                  Follow
+                  {isPending ? (
+                    <LoadingSpinner size={20} />
+                  ) : authUser.following.includes(userProfile?._id) ? (
+                    "Unfollow"
+                  ) : (
+                    "Follow"
+                  )}
                 </Button>
               )}
               {(coverImg || profileImg) && (
                 <Button
-                  onClick={() => alert("Profile updated successfully")}
+                  onClick={() => editProfileImage()}
                   className="invert-btn"
                 >
-                  Update
+                  {isEditImagePending ? <LoadingSpinner size={20} /> : "Update"}
                 </Button>
               )}
             </div>
 
             <div className="profile-details">
               <div className="main-details">
-                <span className="full-name">{userProfile?.fullName}</span>
+                <span className="full-name">
+                  {userProfile?.fullName}
+                  {userProfile?.isVerified && <MdVerified />}
+                </span>
                 <span className="user-name">@{userProfile?.userName}</span>
                 <span className="bio">{userProfile?.bio}</span>
               </div>
@@ -210,7 +268,7 @@ const ProfilePage = () => {
           </>
         )}
 
-        <Posts feedType={feedType}/>
+        <Posts feedType={feedType} />
       </div>
     </PageLayout>
   );

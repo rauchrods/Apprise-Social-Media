@@ -94,7 +94,7 @@ const Sidebar = () => {
             onClick={() => navigate(`/profile/${authUser.userName}`)}
           >
             <Avatar
-              src={authUser?.profileImg || "/avatar-placeholder.png"}
+              src={authUser?.profileImage || "/avatar-placeholder.png"}
               style={{ width: "40px", height: "40px" }}
             />
             <div className="user-details">

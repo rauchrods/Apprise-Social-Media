@@ -88,6 +88,7 @@ const Post = ({ post }) => {
   const postOwner = post.user;
 
   const isMyPost = authUser?._id === post.user?._id;
+  const isAdmin = authUser?.isAdmin;
 
   const formattedDate = getPostFormattedDate(post.createdAt);
   const isCommenting = false;
@@ -131,7 +132,7 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {isMyPost && (
+        {(isMyPost || isAdmin) && (
           <>
             {!isDeleting && (
               <FaTrash

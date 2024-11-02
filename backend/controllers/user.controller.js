@@ -76,6 +76,7 @@ export const followUnfollowUser = async (req, res) => {
       res.status(200).json({ message: "User followed successfully" });
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: "Internal server error",
     });
@@ -124,7 +125,6 @@ export const updateUserProfile = async (req, res) => {
     let {
       userName,
       fullName,
-      email,
       profileImage,
       coverImage,
       bio,
@@ -192,16 +192,14 @@ export const updateUserProfile = async (req, res) => {
           user.coverImage.split("/").pop().split(".")[0]
         );
       }
-      const uploadResult = await cloudinary.uploader.upload(coverImage, {
-        public_id: "cover-image",
-      });
+      const uploadResult = await cloudinary.uploader.upload(coverImage);
 
       coverImage = uploadResult.secure_url;
     }
 
     user.fullName = fullName || user.fullName;
     user.userName = userName || user.userName;
-    user.email = email || user.email;
+    // user.email = email || user.email;
     user.bio = bio || user.bio;
     user.link = link || user.link;
     user.profileImage = profileImage || user.profileImage;
@@ -213,9 +211,9 @@ export const updateUserProfile = async (req, res) => {
 
     return res.status(200).json({
       message: "User updated successfully",
-      user,
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({
       error: `Internal server error: ${error.message}`,
     });
