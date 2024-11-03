@@ -56,6 +56,78 @@
         width: 100%;
       }
     }
+
+    .comments-modal {
+      max-width: 50%;
+      min-width: 320px;
+      height: 420px;
+
+      background-color: $primary-dark;
+      color: $white;
+      padding: 1rem;
+      border-radius: 10px;
+
+      .header {
+        border-bottom: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        h3 {
+          margin: 0.4rem 0;
+        }
+        svg {
+          font-size: 1.2rem;
+          cursor: pointer;
+        }
+      }
+
+      .no-comments-tag {
+        margin: 0.5rem 0;
+      }
+
+      .comments {
+        overflow-y: auto;
+        height: 70%;
+
+        .comment-container {
+          display: flex;
+          flex-direction: column;
+          margin: 0.8rem 0;
+          .comment-header {
+            display: flex;
+            flex-direction: flex-start;
+            column-gap: 0.6rem;
+            align-items: center;
+            .right-sec {
+              display: flex;
+              flex-direction: column;
+              font-size: 0.85rem;
+
+              a:nth-child(2) {
+                color: $primary-gray;
+              }
+            }
+          }
+
+          .comment-text {
+            font-size: 0.9rem;
+            margin-left: 2.5rem;
+          }
+        }
+      }
+
+      form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        column-gap: 0.5rem;
+        margin-top: 1.2rem;
+
+        textarea {
+          width: 100%;
+        }
+      }
+    }
   }
 
   .post-footer {

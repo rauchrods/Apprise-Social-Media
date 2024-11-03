@@ -88,7 +88,7 @@ export const commentPost = async (req, res) => {
   try {
     const postId = req.params.id;
     const { text } = req.body;
-    const userId = req.user._id.toString();
+    const userId = req.user._id;
 
     if (!text) {
       return res.status(400).json({
@@ -108,13 +108,31 @@ export const commentPost = async (req, res) => {
       user: userId,
       text,
     };
-    //cloud.mongodb.com/v2/66e5277a54d02724f8121875#/migration
 
     post.comments.push(newComment);
     await post.save();
 
+    const newPost = await Post.findById(postId)
+    .populate({
+      path: "comments.user",
+      select: [
+        "-password",
+        "-email",
+        "-bio",
+        "-coverImage",
+        "-followers",
+        "-following",
+        "-likedPosts",
+        "-createdAt",
+        "-updatedAt",
+        "-isAdmin",
+        "-isVerified",
+      ],
+    });
+
     res.status(200).json({
-      post,
+      message: "Comment added successfully",
+      newComments: newPost.comments,
     });
   } catch (error) {
     console.log(error.message);
@@ -211,7 +229,22 @@ export const getAllPosts = async (req, res) => {
           "-isVerified",
         ],
       })
-      .populate({ path: "comments.user", select: ["-password", "-email"] });
+      .populate({
+        path: "comments.user",
+        select: [
+          "-password",
+          "-email",
+          "-bio",
+          "-coverImage",
+          "-followers",
+          "-following",
+          "-likedPosts",
+          "-createdAt",
+          "-updatedAt",
+          "-isAdmin",
+          "-isVerified",
+        ],
+      });
 
     const sortedPosts = posts.sort((a, b) => {
       if (

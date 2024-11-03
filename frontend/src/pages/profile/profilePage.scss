@@ -119,8 +119,9 @@
 
     .link-join-date {
       display: flex;
+      flex-direction: column;
       font-size: 0.9rem;
-      column-gap: 0.8rem;
+      gap: 0.6rem;
 
       .link-sec,
       .join-date-sec {

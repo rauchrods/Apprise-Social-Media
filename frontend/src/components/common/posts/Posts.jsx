@@ -8,8 +8,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 const Posts = ({ feedType }) => {
-
-  const {userName} = useParams();
+  const { userName } = useParams();
   const getPostEndpoint = () => {
     switch (feedType) {
       case "forYou":
@@ -18,7 +17,7 @@ const Posts = ({ feedType }) => {
         return "/api/posts/following";
       case "posts":
         return `/api/posts/user/${userName}`;
-        case "liked":
+      case "liked":
         return `/api/posts/liked/${userName}`;
       default:
         return "/api/posts/all";
@@ -48,7 +47,7 @@ const Posts = ({ feedType }) => {
     },
     onError: (error) => {
       toast.error(error.message);
-    }
+    },
   });
 
   // console.log("posts: ", posts);
@@ -69,6 +68,7 @@ const Posts = ({ feedType }) => {
       {!isLoading && !isRefetching && posts && posts.size === 0 && (
         <p className="no-posts">No posts in this tab. Switch 👻</p>
       )}
+
       {!isLoading && !isRefetching && posts && (
         <div className="display-posts">
           {posts.posts.map((post) => (
