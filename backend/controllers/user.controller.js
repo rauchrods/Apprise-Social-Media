@@ -21,6 +21,86 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
+export const getSearchedUsers = async (req, res) => {
+  try {
+    const currentUser = req.user;
+
+    const { searchQuery } = req.query;
+
+    if (!searchQuery) {
+      return res.status(200).json({
+        users: [],
+        size: 0,
+      });
+    }
+
+    const searchRegex = new RegExp(searchQuery, "i");
+
+    const users = await User.find({
+      $and: [
+        // Search criteria
+        { $or: [{ userName: searchRegex }, { fullName: searchRegex }] },
+        // Exclude current user
+        { _id: { $ne: currentUser._id } },
+      ],
+    })
+      .select([
+        "userName",
+        "fullName",
+        "profileImage",
+        "bio",
+        "isVerified",
+        "link",
+        "followers",
+        "following",
+      ])
+      .limit(10)
+      .lean();
+
+    users.sort((a, b) => {
+      // Check if users are mutually following/followed by current user
+      const aIsMutual =
+        currentUser.following.some((id) => id.equals(a._id)) &&
+        currentUser.followers.some((id) => id.equals(a._id));
+      const bIsMutual =
+        currentUser.following.some((id) => id.equals(b._id)) &&
+        currentUser.followers.some((id) => id.equals(b._id));
+
+      // Check if users are followed by current user
+      const aIsFollowed = currentUser.following.some((id) => id.equals(a._id));
+      const bIsFollowed = currentUser.following.some((id) => id.equals(b._id));
+
+      // Check if users are followers of current user
+      const aIsFollower = currentUser.followers.some((id) => id.equals(a._id));
+      const bIsFollower = currentUser.followers.some((id) => id.equals(b._id));
+
+      // 1. Mutual follows get highest priority
+      if (aIsMutual && !bIsMutual) return -1;
+      if (!aIsMutual && bIsMutual) return 1;
+
+      // 2. Users followed by current user get second priority
+      if (aIsFollowed && !bIsFollowed) return -1;
+      if (!aIsFollowed && bIsFollowed) return 1;
+
+      // 3. Followers of current user get third priority
+      if (aIsFollower && !bIsFollower) return -1;
+      if (!aIsFollower && bIsFollower) return 1;
+
+      // 4. If none of the above, sort by followers count
+      return b.followers.length - a.followers.length;
+    });
+    res.status(200).json({
+      users,
+      size: users.length,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 export const followUnfollowUser = async (req, res) => {
   try {
     const { id } = req.params;

@@ -183,21 +183,71 @@ export const likeUnlikePost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
   try {
+    const currentUserId = req.user._id;
+
+    const currentUser = await User.findById(currentUserId);
+
+    if (!currentUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
-        select: ["-password", "-email"],
+        select: [
+          "-password",
+          "-email",
+          "-bio",
+          "-coverImage",
+          "-followers",
+          "-following",
+          "-likedPosts",
+          "-createdAt",
+          "-updatedAt",
+          "-isAdmin",
+          "-isVerified",
+        ],
       })
       .populate({ path: "comments.user", select: ["-password", "-email"] });
 
-    // if (posts.length === 0) {
-    //   return res.status(200).json([]);
-    // }
+    const sortedPosts = posts.sort((a, b) => {
+      if (
+        currentUser._id.equals(a.user._id) &&
+        !currentUser._id.equals(b.user._id)
+      ) {
+        return -1;
+      }
+      if (
+        !currentUser._id.equals(a.user._id) &&
+        currentUser._id.equals(b.user._id)
+      ) {
+        return 1;
+      }
+      if (
+        currentUser.following.includes(a.user._id) &&
+        !currentUser.following.includes(b.user._id)
+      ) {
+        return -1;
+      }
+      if (
+        !currentUser.following.includes(a.user._id) &&
+        currentUser.following.includes(b.user._id)
+      ) {
+        return 1;
+      }
+      if (a.likes.length !== b.likes.length) {
+        return b.likes.length - a.likes.length;
+      }
+
+      return b.createdAt - a.createdAt;
+    });
 
     res.status(200).json({
-      posts,
-      size: posts.length,
+      posts: sortedPosts,
+      size: sortedPosts.length,
     });
   } catch (error) {
     console.log(error.message);
@@ -209,8 +259,8 @@ export const getAllPosts = async (req, res) => {
 
 export const getLikedPosts = async (req, res) => {
   try {
-    const {userName} = req.params;
-    const user = await User.findOne({userName});
+    const { userName } = req.params;
+    const user = await User.findOne({ userName });
     if (!user) {
       return res.status(404).json({
         error: "User not found",
@@ -260,7 +310,7 @@ export const getFollowingPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
-    const {userName} = req.params;
+    const { userName } = req.params;
 
     const user = await User.findOne({ userName }).select("-password");
     if (!user) {

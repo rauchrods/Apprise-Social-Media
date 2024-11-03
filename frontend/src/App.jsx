@@ -10,6 +10,7 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/loadingSpinner/LoadingSpinner";
+import SearchUsersPage from "./pages/searchUsers/SearchUsersPage";
 
 function App() {
   const {
@@ -68,6 +69,10 @@ function App() {
         <Route
           path="/profile/:userName"
           element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/search"
+          element={authUser ? <SearchUsersPage/> : <Navigate to="/login" />}
         />
         <Route
           path="/login"

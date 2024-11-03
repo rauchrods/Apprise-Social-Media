@@ -5,10 +5,16 @@ import Avatar from "../../ui/avatar/Avatar";
 import { useNavigate } from "react-router-dom";
 import useFollow from "../../hooks/useFollow";
 import LoadingSpinner from "../common/loadingSpinner/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
 
-const SuggestedUserCard = ({ user }) => {
+const SuggestedUserCard = ({ user, isShowElipsis = true }) => {
   const navigate = useNavigate();
 
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+  });
+
+  const iFollowing = authUser?.following.includes(user?._id);
   const { followUnfollow, isPending } = useFollow();
 
   const followUnfollowHandler = (e) => {
@@ -27,9 +33,13 @@ const SuggestedUserCard = ({ user }) => {
           style={{ width: "30px", height: "30px" }}
         />
 
-        <div className="details">
-          <span className="full-name">{user.fullName}</span>
-          <span className="user-name">@{user.userName}</span>
+        <div className={`details`}>
+          <span className={`full-name ${isShowElipsis ? "show-elipsis" : ""}`}>
+            {user.fullName}
+          </span>
+          <span className={`user-name ${isShowElipsis ? "show-elipsis" : ""}`}>
+            @{user.userName}
+          </span>
         </div>
       </div>
 
@@ -39,7 +49,13 @@ const SuggestedUserCard = ({ user }) => {
         style={{ padding: "6px 8px" }}
         disabled={isPending}
       >
-        {isPending ? <LoadingSpinner size={16}/> : "Follow"}
+        {isPending ? (
+          <LoadingSpinner size={16} />
+        ) : iFollowing ? (
+          "Unfollow"
+        ) : (
+          "Follow"
+        )}
       </Button>
     </div>
   );

@@ -20,18 +20,18 @@
       flex-direction: column;
       max-width: 115px;
 
-      .user-name {
-        font-size: 0.72rem;
-        color: $primary-gray;
+      .show-elipsis {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
+      .user-name {
+        font-size: 0.72rem;
+        color: $primary-gray;
+      }
+
       .full-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
     }
   }

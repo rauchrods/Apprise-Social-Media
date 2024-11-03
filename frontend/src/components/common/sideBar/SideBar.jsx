@@ -8,6 +8,7 @@ import "./sideBar.scss";
 import Avatar from "../../../ui/avatar/Avatar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { FaSearch } from "react-icons/fa";
 
 const data = {
   fullName: "John Doe",
@@ -65,6 +66,11 @@ const Sidebar = () => {
       name: "Profile",
       icon: <FaUser size={22} />,
       path: `/profile/${authUser?.userName}`,
+    },
+    {
+      name: "Search",
+      icon: <FaSearch  size={22} />,
+      path: `/search/`,
     },
   ];
 
