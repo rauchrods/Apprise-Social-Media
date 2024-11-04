@@ -7,18 +7,17 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/avatar/Avatar";
 import "./post.scss";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import toast, { ToastBar } from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import LoadingSpinner from "../loadingSpinner/LoadingSpinner";
 import { getPostFormattedDate } from "../../../utils/utilFunctions";
 import Input from "../../../ui/input/Input";
 import Button from "../../../ui/button/Button";
+import { useSelector } from "react-redux";
 
 const Post = ({ post }) => {
   const queryClient = useQueryClient();
-  const { data: authUser } = useQuery({
-    queryKey: ["authUser"],
-  });
+  const { user: authUser } = useSelector((state) => state.auth);
 
   // console.log("authUser: ", authUser);
 

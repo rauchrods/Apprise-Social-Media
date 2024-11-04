@@ -11,8 +11,11 @@ import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/loadingSpinner/LoadingSpinner";
 import SearchUsersPage from "./pages/searchUsers/SearchUsersPage";
+import { useDispatch } from "react-redux";
+import { setUser } from "./redux/features/authSlice";
 
 function App() {
+  const dispatch = useDispatch();
   const {
     data: authUser,
     isLoading,
@@ -31,16 +34,20 @@ function App() {
         if (!res.ok) {
           throw new Error(data?.error || "Something went wrong");
         }
-
+        dispatch(setUser(data));
         return data;
       } catch (error) {
         throw new Error(error);
       }
     },
+    onSuccess: (data) => {
+      console.log("Auth User on success: ", data);
+      dispatch(setUser(data));
+    },
     onError: (error) => {
       toast.error(error.message);
     },
-    retry: false,
+    // retry: false,
   });
 
   // console.log("data:authUser ", authUser);
@@ -72,7 +79,7 @@ function App() {
         />
         <Route
           path="/search"
-          element={authUser ? <SearchUsersPage/> : <Navigate to="/login" />}
+          element={authUser ? <SearchUsersPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/login"

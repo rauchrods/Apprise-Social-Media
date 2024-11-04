@@ -13,6 +13,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.3",
+    "@reduxjs/toolkit": "^2.3.0",
     "@tanstack/react-query": "^5.59.15",
     "frontend": "file:",
     "lodash": "^4.17.21",
@@ -20,6 +21,7 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.3.0",
+    "react-redux": "^9.1.2",
     "react-router-dom": "^6.26.2",
     "sass": "^1.79.4"
   },

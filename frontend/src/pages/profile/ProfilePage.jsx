@@ -18,6 +18,7 @@ import useFollow from "../../hooks/useFollow";
 import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinner";
 import toast from "react-hot-toast";
 import ProfileHeaderSkeleton from "./ProfileHeaderSkeleton";
+import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
@@ -94,10 +95,9 @@ const ProfilePage = () => {
 
   // console.log("userProfile: ", userProfile);
 
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { user: authUser } = useSelector((state) => state.auth);
 
   const isMyProfile = authUser?._id === userProfile?._id;
-  
 
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
@@ -144,7 +144,7 @@ const ProfilePage = () => {
                   src={coverImg || userProfile?.coverImage || "/cover.png"}
                   alt="cover image"
                 />
-                {(isMyProfile) && (
+                {isMyProfile && (
                   <div className="edit-cover-svg">
                     <MdEdit onClick={() => coverImgRef.current.click()} />
                   </div>

@@ -6,19 +6,20 @@ import { BiLogOut } from "react-icons/bi";
 import AppriseLogo from "../../appriseLogo/AppriseLogo";
 import "./sideBar.scss";
 import Avatar from "../../../ui/avatar/Avatar";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { FaSearch } from "react-icons/fa";
-
-const data = {
-  fullName: "John Doe",
-  username: "johndoe",
-  profileImg: "/avatars/boy1.png",
-};
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../redux/features/authSlice";
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const { user: authUser } = useSelector((state) => state.auth);
+
+  // console.log("authUser redux: ", authUser);
 
   const { mutate } = useMutation({
     mutationFn: async () => {
@@ -47,10 +48,6 @@ const Sidebar = () => {
     },
   });
 
-  const { data: authUser } = useQuery({
-    queryKey: ["authUser"],
-  });
-
   const options = [
     {
       name: "Home",
@@ -69,7 +66,7 @@ const Sidebar = () => {
     },
     {
       name: "Search",
-      icon: <FaSearch  size={22} />,
+      icon: <FaSearch size={22} />,
       path: `/search/`,
     },
   ];
@@ -112,6 +109,7 @@ const Sidebar = () => {
             className="right-sec"
             onClick={(e) => {
               e.preventDefault();
+              dispatch(logout());
               mutate();
             }}
           >
