@@ -32,7 +32,7 @@ const ProfileHeaderSkeleton = () => {
         {/* USER AVATAR */}
 
         <div className="profile-pic-container">
-          <Skeleton variant="rounded" width={100} height={100} sx={constant} />
+          <Skeleton variant="circular" width={100} height={100} sx={constant} />
         </div>
       </div>
       <div className="btn-sec">
