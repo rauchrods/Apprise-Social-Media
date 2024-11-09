@@ -246,41 +246,41 @@ export const getAllPosts = async (req, res) => {
         ],
       });
 
-    const sortedPosts = posts.sort((a, b) => {
-      if (
-        currentUser._id.equals(a.user._id) &&
-        !currentUser._id.equals(b.user._id)
-      ) {
-        return -1;
-      }
-      if (
-        !currentUser._id.equals(a.user._id) &&
-        currentUser._id.equals(b.user._id)
-      ) {
-        return 1;
-      }
-      if (
-        currentUser.following.includes(a.user._id) &&
-        !currentUser.following.includes(b.user._id)
-      ) {
-        return -1;
-      }
-      if (
-        !currentUser.following.includes(a.user._id) &&
-        currentUser.following.includes(b.user._id)
-      ) {
-        return 1;
-      }
-      if (a.likes.length !== b.likes.length) {
-        return b.likes.length - a.likes.length;
-      }
+    // const sortedPosts = posts.sort((a, b) => {
+    //   if (
+    //     currentUser._id.equals(a.user._id) &&
+    //     !currentUser._id.equals(b.user._id)
+    //   ) {
+    //     return -1;
+    //   }
+    //   if (
+    //     !currentUser._id.equals(a.user._id) &&
+    //     currentUser._id.equals(b.user._id)
+    //   ) {
+    //     return 1;
+    //   }
+    //   if (
+    //     currentUser.following.includes(a.user._id) &&
+    //     !currentUser.following.includes(b.user._id)
+    //   ) {
+    //     return -1;
+    //   }
+    //   if (
+    //     !currentUser.following.includes(a.user._id) &&
+    //     currentUser.following.includes(b.user._id)
+    //   ) {
+    //     return 1;
+    //   }
+    //   if (a.likes.length !== b.likes.length) {
+    //     return b.likes.length - a.likes.length;
+    //   }
 
-      return b.createdAt - a.createdAt;
-    });
+    //   return b.createdAt - a.createdAt;
+    // });
 
     res.status(200).json({
-      posts: sortedPosts,
-      size: sortedPosts.length,
+      posts,
+      size: posts.length,
     });
   } catch (error) {
     console.log(error.message);
