@@ -14,11 +14,12 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.8rem;
+    flex-grow: 1;
 
     .details {
       display: flex;
       flex-direction: column;
-      max-width: 115px;
+      max-width: 100%;
 
       .show-elipsis {
         white-space: nowrap;

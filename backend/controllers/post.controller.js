@@ -112,8 +112,15 @@ export const commentPost = async (req, res) => {
     post.comments.push(newComment);
     await post.save();
 
-    const newPost = await Post.findById(postId)
-    .populate({
+    const notification = new Notification({
+      from: userId,
+      to: post.user,
+      type: "comment",
+    });
+
+    await notification.save();
+
+    const newPost = await Post.findById(postId).populate({
       path: "comments.user",
       select: [
         "-password",

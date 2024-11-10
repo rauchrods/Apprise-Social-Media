@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
+import { FaComment, FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import PageLayout from "../../components/pageLayout/PageLayout";
 import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinner";
@@ -35,7 +35,7 @@ const NotificationPage = () => {
     },
   });
 
-  const { mutate: deleteAll , isPending} = useMutation({
+  const { mutate: deleteAll, isPending } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch("/api/notifications/all", {
@@ -100,6 +100,9 @@ const NotificationPage = () => {
                   <FaUser className="follow" />
                 )}
                 {notification.type === "like" && <FaHeart className="like" />}
+                {notification.type === "comment" && (
+                  <FaComment className="comment" />
+                )}
               </div>
               <div
                 className="mid-sec"
@@ -119,7 +122,9 @@ const NotificationPage = () => {
                   <span>
                     {notification.type === "follow"
                       ? "followed you"
-                      : "liked your post"}
+                      : notification.type === "like"
+                      ? "liked your post"
+                      : "commented on your post"}
                   </span>
                 </div>
               </div>

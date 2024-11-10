@@ -115,7 +115,11 @@ const Sidebar = () => {
           >
             <Avatar
               src={authUser?.profileImage || "/avatar-placeholder.png"}
-              style={{ width: "40px", height: "40px" }}
+              style={
+                isMobileView
+                  ? { width: "35px", height: "35px" }
+                  : { width: "40px", height: "40px" }
+              }
             />
             {!isMobileView && (
               <div className="user-details">
