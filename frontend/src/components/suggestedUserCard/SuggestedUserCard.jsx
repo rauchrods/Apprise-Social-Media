@@ -29,8 +29,8 @@ const SuggestedUserCard = ({ user, isShowElipsis = true }) => {
     >
       <div className="left-sec">
         <Avatar
-          src={user.profileImg || "/avatar-placeholder.png"}
-          style={{ width: "30px", height: "30px" }}
+          src={user.profileImage || "/avatar-placeholder.png"}
+          style={{ width: "35px", height: "35px" }}
         />
 
         <div className={`details`}>
