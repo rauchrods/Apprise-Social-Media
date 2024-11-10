@@ -21,8 +21,6 @@ const Sidebar = () => {
 
   const { user: authUser } = useSelector((state) => state.auth);
 
-  console.log("isMobileView: ", isMobileView);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 900);

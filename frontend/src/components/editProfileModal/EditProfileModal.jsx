@@ -7,6 +7,8 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../common/loadingSpinner/LoadingSpinner";
 import toast from "react-hot-toast";
+import { trimObjectValues } from "../../utils/utilFunctions";
+import { useSelector } from "react-redux";
 
 const EditProfileModal = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +20,7 @@ const EditProfileModal = () => {
     currentPassword: "",
   });
 
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { user: authUser } = useSelector((state) => state.auth);
 
   const queryClient = useQueryClient();
 
@@ -37,7 +39,7 @@ const EditProfileModal = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify(trimObjectValues(formData)),
           });
           const data = await res.json();
           if (!res.ok) {

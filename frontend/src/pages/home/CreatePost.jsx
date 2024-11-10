@@ -6,8 +6,9 @@ import Avatar from "../../ui/avatar/Avatar";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import "./createPost.scss";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const CreatePost = () => {
   const [text, setText] = useState("");
@@ -15,9 +16,7 @@ const CreatePost = () => {
 
   const imgRef = useRef(null);
 
-  const { data: authUser } = useQuery({
-    queryKey: ["authUser"],
-  });
+  const { user: authUser } = useSelector((state) => state.auth);
 
   const queryClient = useQueryClient();
 
@@ -83,7 +82,7 @@ const CreatePost = () => {
   return (
     <div className="create-post-container">
       <Avatar
-        src={authUser?.profileImg || "/avatar-placeholder.png"}
+        src={authUser?.profileImage || "/avatar-placeholder.png"}
         style={{ width: "35px", height: "35px" }}
       />
 
