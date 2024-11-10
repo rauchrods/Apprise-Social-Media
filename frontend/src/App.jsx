@@ -13,6 +13,7 @@ import LoadingSpinner from "./components/common/loadingSpinner/LoadingSpinner";
 import SearchUsersPage from "./pages/searchUsers/SearchUsersPage";
 import { useDispatch } from "react-redux";
 import { setUser } from "./redux/features/authSlice";
+import SuggestedUsers from "./pages/SuggestedUsers/SuggestedUsers";
 
 function App() {
   const dispatch = useDispatch();
@@ -82,6 +83,10 @@ function App() {
           element={authUser ? <SearchUsersPage /> : <Navigate to="/login" />}
         />
         <Route
+          path="/suggested/users"
+          element={authUser ? <SuggestedUsers /> : <Navigate to="/login" />}
+        />
+        <Route
           path="/login"
           element={authUser ? <Navigate to="/" /> : <LoginPage />}
         />
@@ -91,7 +96,7 @@ function App() {
         />
       </Routes>
 
-      {authUser && <RightPanel />}
+      {/* {authUser && <RightPanel />} */}
       <Toaster />
     </div>
   );
