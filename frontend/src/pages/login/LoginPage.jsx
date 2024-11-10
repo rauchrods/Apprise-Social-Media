@@ -11,6 +11,7 @@ import "./loginPage.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Credit from "../../ui/credit/Credit";
+import { trimObjectValues } from "../../utils/utilFunctions";
 
 const LoginPage = () => {
   const queryClient = useQueryClient();
@@ -22,8 +23,10 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutate(formData);
+    mutate(trimObjectValues(formData));
   };
+
+  console.log("formData: ", formData);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

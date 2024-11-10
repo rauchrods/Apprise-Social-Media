@@ -19,8 +19,16 @@
     resize: none;
 
     &:focus {
-      border: 1px solid $secondary-gray;
+      border: 2px solid $secondary-gray;
+      background-color: $primary-dark;
     }
+  }
+
+  .custom-input:-webkit-autofill,
+  .custom-input:-webkit-autofill:hover,
+  .custom-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px $primary-dark inset !important;
+    -webkit-text-fill-color: $white !important;
   }
   .input-with-icon {
     padding-left: 1.6rem;

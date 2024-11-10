@@ -208,38 +208,44 @@ const Post = ({ post }) => {
             />
           </div>
 
-          {post.comments.length === 0 && (
+          {post.comments.length === 0 ? (
             <p className="no-comments-tag">
               No comments yet 🤔 Be the first one 😉
             </p>
-          )}
-          <div className="comments">
-            {post.comments.map((comment) => (
-              <div key={comment._id} className="comment-container">
-                <div className="comment-header">
-                  <Avatar
-                    src={comment.user.profileImage || "/avatar-placeholder.png"}
-                    style={{ width: "30px", height: "30px", cursor: "pointer" }}
-                    onClick={() =>
-                      navigate(`/profile/${comment.user?.userName}`)
-                    }
-                  />
+          ) : (
+            <div className="comments">
+              {post.comments.map((comment) => (
+                <div key={comment._id} className="comment-container">
+                  <div className="comment-header">
+                    <Avatar
+                      src={
+                        comment.user.profileImage || "/avatar-placeholder.png"
+                      }
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        navigate(`/profile/${comment.user?.userName}`)
+                      }
+                    />
 
-                  <div className="right-sec">
-                    <Link to={`/profile/${comment.user?.userName}`}>
-                      {comment.user?.fullName}
-                    </Link>
-                    <Link to={`/profile/${comment.user?.userName}`}>
-                      @{comment.user?.userName}
-                    </Link>
+                    <div className="right-sec">
+                      <Link to={`/profile/${comment.user?.userName}`}>
+                        {comment.user?.fullName}
+                      </Link>
+                      <Link to={`/profile/${comment.user?.userName}`}>
+                        @{comment.user?.userName}
+                      </Link>
+                    </div>
                   </div>
+
+                  <div className="comment-text">{comment.text}</div>
                 </div>
-
-                <div className="comment-text">{comment.text}</div>
-              </div>
-            ))}
-          </div>
-
+              ))}
+            </div>
+          )}
           <form onSubmit={handlePostComment}>
             <Input
               value={comment}

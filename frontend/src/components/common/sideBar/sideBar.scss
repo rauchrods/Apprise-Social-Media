@@ -72,3 +72,23 @@
     }
   }
 }
+
+@media (width<= 900px) {
+  .side-bar {
+    padding: 0.2rem;
+    .top-sec {
+      a {
+        text-align: center;
+      }
+      .side-bar-options {
+        .side-bar-list-item {
+          justify-content: center;
+        }
+      }
+    }
+
+    .bottom-sec {
+      column-gap: 0.6rem;
+    }
+  }
+}

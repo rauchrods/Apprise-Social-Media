@@ -11,6 +11,7 @@ import "./signUpPage.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Credit from "../../ui/credit/Credit";
+import { trimObjectValues } from "../../utils/utilFunctions";
 
 const SignUpPage = () => {
   const queryClient = useQueryClient();
@@ -99,9 +100,9 @@ const SignUpPage = () => {
     e.preventDefault();
 
     if (!otpSent) {
-      signUp(formData);
+      signUp(trimObjectValues(formData));
     } else {
-      validateOtp(formData);
+      validateOtp(trimObjectValues(formData));
     }
   };
 

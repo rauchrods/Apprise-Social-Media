@@ -60,7 +60,8 @@
     .comments-modal {
       max-width: 50%;
       min-width: 320px;
-      height: 420px;
+      min-height: 380px;
+      height: 60vh;
 
       background-color: $primary-dark;
       color: $white;
@@ -121,7 +122,7 @@
         justify-content: space-between;
         align-items: center;
         column-gap: 0.5rem;
-        margin-top: 1.2rem;
+        margin-top: 1rem;
 
         textarea {
           width: 100%;

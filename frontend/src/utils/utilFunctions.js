@@ -28,11 +28,31 @@ export const getPostFormattedDate = (createdAt) => {
   return `${years} y`;
 };
 
-
 export const getUserFormattedDate = (createdAt) => {
   const postDate = new Date(createdAt);
   return postDate.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
-}
+};
+
+export const trimObjectValues = (obj) => {
+  // Handle non-objects or null
+  if (!obj || typeof obj !== "object") {
+    return obj;
+  }
+
+  const trimmedObject = {};
+
+  for (const key in obj) {
+    const value = obj[key];
+
+    if (typeof value === "string") {
+      trimmedObject[key] = value.trim();
+    } else {
+      trimmedObject[key] = value;
+    }
+  }
+
+  return trimmedObject;
+};

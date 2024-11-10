@@ -11,15 +11,29 @@ import toast from "react-hot-toast";
 import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/features/authSlice";
+import { useEffect, useState } from "react";
 
 const Sidebar = () => {
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { user: authUser } = useSelector((state) => state.auth);
 
-  // console.log("authUser redux: ", authUser);
+  console.log("isMobileView: ", isMobileView);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 900);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const { mutate } = useMutation({
     mutationFn: async () => {
@@ -72,10 +86,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="side-bar">
+    <div className={`side-bar${isMobileView ? " mobile-view" : ""}`}>
       <div className="top-sec">
         <Link to="/">
-          <AppriseLogo />
+          <AppriseLogo text={isMobileView ? "A" : "Apprise"} />
         </Link>
         <div className="side-bar-options">
           {options.map((option) => (
@@ -85,7 +99,7 @@ const Sidebar = () => {
               key={option.name}
             >
               {option.icon}
-              <span>{option.name}</span>
+              {!isMobileView && <span>{option.name}</span>}
             </div>
           ))}
         </div>
@@ -100,10 +114,12 @@ const Sidebar = () => {
               src={authUser?.profileImage || "/avatar-placeholder.png"}
               style={{ width: "40px", height: "40px" }}
             />
-            <div className="user-details">
-              <p>{authUser?.fullName}</p>
-              <p>@{authUser?.userName}</p>
-            </div>
+            {!isMobileView && (
+              <div className="user-details">
+                <p>{authUser?.fullName}</p>
+                <p>@{authUser?.userName}</p>
+              </div>
+            )}
           </div>
           <div
             className="right-sec"

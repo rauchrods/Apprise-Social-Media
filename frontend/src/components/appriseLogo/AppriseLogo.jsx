@@ -2,10 +2,10 @@ import React from "react";
 
 import "./appriseLogo.scss";
 
-const AppriseLogo = ({...props}) => {
+const AppriseLogo = ({ text = "Apprise", ...props }) => {
   return (
     <div className="apprise-logo" {...props}>
-      <h2>Apprise</h2>
+      <h2>{text}</h2>
     </div>
   );
 };
