@@ -1,6 +1,14 @@
 import { CronJob } from "cron";
+import dotenv from "dotenv";
 
-const SERVER_URL = "http://localhost:3000";
+dotenv.config();
+
+const NODE_ENV = process.env.NODE_ENV;
+
+const SERVER_URL =
+  NODE_ENV === "production"
+    ? "https://apprise.rauchrodrigues.in"
+    : "http://localhost:3000";
 
 const keepServerAlive = async () => {
   try {
