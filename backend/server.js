@@ -8,6 +8,8 @@ import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 import path from "path";
+import { limiter } from "./middleware/rateLimiter.js";
+import { startKeepAlive } from "./lib/utils/serverKeepAlive.js";
 
 //this is required below for env to work
 dotenv.config();
@@ -19,17 +21,18 @@ cloudinary.config({
 });
 
 const port = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV;
 
 const app = express();
 
 const _dirname = path.resolve();
 
 //middleware below
-
+app.use(limiter);
 //to parse req.body as json
 app.use(
   express.json({
-    limit: "5mb",
+    limit: "10mb",
   })
 );
 
@@ -42,6 +45,7 @@ app.use(
 //to parse cookies
 app.use(cookieParser());
 
+
 //authRoutes
 app.use("/api/auth", authRouter);
 //userRoutes
@@ -51,7 +55,15 @@ app.use("/api/posts", postRouter);
 //notificationRoutes
 app.use("/api/notifications", notificationRouter);
 
-if (process.env.NODE_ENV === "production") {
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Apprise is running!",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+if (NODE_ENV === "production") {
   app.use(express.static(path.join(_dirname, "/frontend/dist")));
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(_dirname, "frontend", "dist", "index.html"));
@@ -59,6 +71,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.listen(port, () => {
-  console.log("server is running on port " + port);
+  console.log("server is running on port " + port + " and env " + NODE_ENV);
   connectMongoDB();
+
+  // Start the keep-alive cron job (only in production)
+  if (NODE_ENV === "production") {
+    startKeepAlive();
+  }
 });
