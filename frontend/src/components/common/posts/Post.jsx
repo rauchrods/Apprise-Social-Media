@@ -14,6 +14,7 @@ import { getPostFormattedDate } from "../../../utils/utilFunctions";
 import Input from "../../../ui/input/Input";
 import Button from "../../../ui/button/Button";
 import { useSelector } from "react-redux";
+import ImageSlider from "../../imageSlider/ImageSlider";
 
 const Post = ({ post }) => {
   const queryClient = useQueryClient();
@@ -193,9 +194,15 @@ const Post = ({ post }) => {
       </div>
 
       <div className="post-body">
-        <span className="post-text">{post.text}</span>
+        {post.text && <span className="post-text">{post.text}</span>}
         <div className="post-img-holder">
-          {post.image && <img src={post.image} alt="post-img" />}
+          {post?.image ? (
+            <img src={post.image} alt="post-img" />
+          ) : post?.images.length > 0 ? (
+            <ImageSlider images={post?.images} />
+          ) : (
+            <></>
+          )}
         </div>
 
         <dialog id={`comments-modal-${post._id}`} className="comments-modal">

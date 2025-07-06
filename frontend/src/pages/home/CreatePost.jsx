@@ -9,12 +9,17 @@ import "./createPost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import ImageSlider from "../../components/imageSlider/ImageSlider";
+import EmojiModal from "../../components/emojiModal/EmojiModal";
 
 const CreatePost = () => {
   const [text, setText] = useState("");
-  const [img, setImg] = useState(null);
+  const [images, setImages] = useState([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const imgRef = useRef(null);
+
+  const textAreaRef = useRef(null);
 
   const { user: authUser } = useSelector((state) => state.auth);
 
@@ -26,7 +31,7 @@ const CreatePost = () => {
     isError,
     error,
   } = useMutation({
-    mutationFn: async ({ text, img }) => {
+    mutationFn: async ({ text, images }) => {
       try {
         const res = await fetch("/api/posts/create", {
           method: "POST",
@@ -35,7 +40,7 @@ const CreatePost = () => {
           },
           body: JSON.stringify({
             text,
-            image: img,
+            images: images,
           }),
         });
         const data = await res.json();
@@ -50,7 +55,7 @@ const CreatePost = () => {
     onSuccess: () => {
       toast.success("Post created successfully");
       setText("");
-      setImg(null);
+      setImages([]);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: (error) => {
@@ -60,23 +65,47 @@ const CreatePost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createPost({ text, img });
+    createPost({ text, images });
   };
 
   const handleImgChange = (e) => {
-    const file = e.target.files[0];
-    console.log(file);
-    if (file) {
-      const reader = new FileReader();
+    const files = Array.from(e.target.files);
+    // console.log(files);
+    if (files.length > 0) {
+      const newImages = [];
 
-      reader.onload = () => {
-        // console.log(reader);
-        setImg(reader.result);
-      };
-      reader.readAsDataURL(file);
+      files.forEach((file) => {
+        const reader = new FileReader();
 
-      // setImg(URL.createObjectURL(file));
+        reader.onload = () => {
+          newImages.push(reader.result);
+
+          // Check if all files have been processed
+          if (newImages.length === files.length) {
+            setImages((prev) => [...prev, ...newImages]);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const handleEmojiClick = (emoji) => {
+    const textArea = textAreaRef.current;
+    const cursorPosition = textArea.selectionStart;
+    const textBeforeCursor = text.substring(0, cursorPosition);
+    const textAfterCursor = text.substring(cursorPosition);
+
+    const newText = textBeforeCursor + emoji + textAfterCursor;
+    setText(newText);
+    textArea.focus();
+
+    setShowEmojiPicker(false);
+  };
+
+  const handleEmojiToggle = () => {
+    setShowEmojiPicker(!showEmojiPicker);
   };
 
   return (
@@ -93,17 +122,17 @@ const CreatePost = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="create-post-textbox"
+          ref={textAreaRef}
         />
-        {img && (
+        {images.length > 0 && (
           <div className="post-img-container">
             <IoCloseSharp
-              className=""
               onClick={() => {
-                setImg(null);
+                setImages([]);
                 imgRef.current.value = null;
               }}
             />
-            <img src={img} />
+            <ImageSlider images={images} />
           </div>
         )}
 
@@ -113,7 +142,10 @@ const CreatePost = () => {
               style={{ fontSize: "25px" }}
               onClick={() => imgRef.current.click()}
             />
-            <BsEmojiSmileFill style={{ fontSize: "25px" }} />
+            <BsEmojiSmileFill
+              style={{ fontSize: "25px", cursor: "pointer" }}
+              onClick={handleEmojiToggle}
+            />
           </div>
           <input
             type="file"
@@ -121,6 +153,7 @@ const CreatePost = () => {
             ref={imgRef}
             onChange={handleImgChange}
             accept="image/*"
+            multiple
           />
           <Button
             style={{ padding: "6px 12px", borderRadius: "15px" }}
@@ -131,6 +164,14 @@ const CreatePost = () => {
         </div>
         {/* {isError && <div className="text-red-500">Something went wrong</div>} */}
       </form>
+
+      {/* Emoji Picker Modal */}
+      {showEmojiPicker && (
+        <EmojiModal
+          setShowEmojiPicker={setShowEmojiPicker}
+          handleEmojiClick={handleEmojiClick}
+        />
+      )}
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const createPost = async (req, res) => {
   try {
-    let { text, image } = req.body;
+    let { text, images } = req.body;
 
     const userId = req.user._id.toString();
 
@@ -18,22 +18,27 @@ export const createPost = async (req, res) => {
       });
     }
 
-    if (!text && !image) {
+    if (!text && !images) {
       return res.status(400).json({
         error: "Text or image is required to create a post",
       });
     }
 
-    if (image) {
-      const uploadResult = await cloudinary.uploader.upload(image);
+    let uploadedImages = [];
 
-      image = uploadResult.secure_url;
+    if (images && images.length > 0) {
+      const uploadPromises = images.map(async (img) => {
+        const uploadResult = await cloudinary.uploader.upload(img);
+        return uploadResult.secure_url;
+      });
+
+      uploadedImages = await Promise.all(uploadPromises);
     }
 
     const newPost = new Post({
       user: userId,
       text,
-      image,
+      images: uploadedImages,
     });
 
     await newPost.save();
@@ -67,9 +72,14 @@ export const deletePost = async (req, res) => {
       });
     }
 
-    if (post.image) {
-      const imageId = post.image.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(imageId);
+    // Delete images from Cloudinary if they exist
+    if (post.images && post.images.length > 0) {
+      const deletePromises = post.images.map(async (imageUrl) => {
+        const imageId = imageUrl.split("/").pop().split(".")[0];
+        return cloudinary.uploader.destroy(imageId);
+      });
+
+      await Promise.all(deletePromises);
     }
 
     await Post.findByIdAndDelete(postId);

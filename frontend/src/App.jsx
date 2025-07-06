@@ -1,4 +1,5 @@
 import "./App.scss";
+import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import SignUpPage from "./pages/signup/SignUpPage";
 import LoginPage from "./pages/login/LoginPage";
@@ -61,6 +62,16 @@ function App() {
     );
   }
 
+  // Protected Route Component
+  const ProtectedRoute = React.memo(({ children, authUser }) => {
+    return authUser ? children : <Navigate to="/login" replace />;
+  });
+
+  // Public Route Component (for login/signup)
+  const PublicRoute = React.memo(({ children, authUser }) => {
+    return !authUser ? children : <Navigate to="/" replace />;
+  });
+
   return (
     <div className="app-container">
       {authUser && <Sidebar />}
@@ -68,31 +79,59 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <HomePage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/notifications"
-          element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <NotificationPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/profile/:userName"
-          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/search"
-          element={authUser ? <SearchUsersPage /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <SearchUsersPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/suggested/users"
-          element={authUser ? <SuggestedUsers /> : <Navigate to="/login" />}
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <SuggestedUsers />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/login"
-          element={authUser ? <Navigate to="/" /> : <LoginPage />}
+          element={
+            <PublicRoute authUser={authUser}>
+              <LoginPage />
+            </PublicRoute>
+          }
         />
         <Route
           path="/signup"
-          element={authUser ? <Navigate to="/" /> : <SignUpPage />}
+          element={
+            <PublicRoute authUser={authUser}>
+              <SignUpPage />
+            </PublicRoute>
+          }
         />
       </Routes>
 

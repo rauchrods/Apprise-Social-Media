@@ -10,14 +10,15 @@ const postSchema = new mongoose.Schema(
     text: {
       type: String,
     },
-    image: {
-      type: String,
+    images: {
+      type: [String],
+      default: [],
     },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default: []
+        default: [],
       },
     ],
     comments: [

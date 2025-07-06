@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
       otp,
     });
 
-    const emailSent = await sendOTPEmail(userName, email, otp);
+    const emailSent = await sendOTPEmail(userName, email, otp, "Signup");
     if (!emailSent) {
       return res.status(400).json({ error: "Failed to send OTP" });
     }
@@ -160,6 +160,59 @@ export const login = async (req, res) => {
         error: "Invalid credentials",
       });
     }
+
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    await Otp.create({
+      email,
+      otp,
+    });
+
+    const emailSent = await sendOTPEmail(
+      existingUser.userName,
+      email,
+      otp,
+      "Login"
+    );
+    if (!emailSent) {
+      return res.status(400).json({ error: "Failed to send OTP" });
+    }
+
+    res.status(200).json({ message: "OTP sent to your email" });
+  } catch (error) {
+    console.log(`Error in login: ${error.message}`);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+export const validateOtplogin = async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
+
+    if (!otp || !email || !password) {
+      return res.status(400).json({
+        error: "All fields are required",
+      });
+    }
+
+    const otpDoc = await Otp.findOne({ email }).sort({ createdAt: -1 });
+    if (!otpDoc) {
+      return res.status(400).json({ error: "OTP expired or not found" });
+    }
+
+    // Verify OTP
+    if (otpDoc.otp !== otp) {
+      return res.status(401).json({ error: "Invalid OTP" });
+    }
+
+    const existingUser = await User.findOne({ email });
 
     generateTokenAndSetCookie(existingUser._id, res);
 
