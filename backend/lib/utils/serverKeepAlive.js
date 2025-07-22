@@ -34,14 +34,14 @@ const keepServerAlive = async () => {
 
 // Create and start cron job
 const startKeepAlive = () => {
-  console.log("🚀 Starting keep-alive cron job (every 14 minutes)");
+  console.log("🚀 Starting keep-alive cron job (every 6 hours)");
 
   // Run immediately on startup
   keepServerAlive();
 
   //cron job to run every 14 minutes
   const job = new CronJob(
-    "*/14 * * * *", // Every 14 minutes
+    "0 */6 * * *", // Every 6 hours 
     keepServerAlive, // Function to run
     null, // onComplete
     true, // Start immediately
