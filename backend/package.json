@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development nodemon backend/server.js",
-    "start": "cross-env NODE_ENV=production node backend/server.js",
-    "build": "npm install && cd frontend && npm install && npm run build && cd .."
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "build": "npm install && cd ../frontend && npm install && npm run build && cd ../"
   },
   "keywords": [],
   "author": "",
