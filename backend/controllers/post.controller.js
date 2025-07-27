@@ -307,6 +307,65 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
+export const getPostById = async (req, res) => {
+  try {
+    const currentUserId = req.user._id;
+
+    const currentUser = await User.findById(currentUserId);
+
+    if (!currentUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+    const postId = req.params.id;
+    const post = await Post.findById(postId)
+      .populate({
+        path: "user",
+        select: [
+          "-password",
+          "-email",
+          "-bio",
+          "-coverImage",
+          "-followers",
+          "-following",
+          "-likedPosts",
+          "-createdAt",
+          "-updatedAt",
+          "-isAdmin",
+          "-isVerified",
+        ],
+      })
+      .populate({
+        path: "comments.user",
+        select: [
+          "-password",
+          "-email",
+          "-bio",
+          "-coverImage",
+          "-followers",
+          "-following",
+          "-likedPosts",
+          "-createdAt",
+          "-updatedAt",
+          "-isAdmin",
+          "-isVerified",
+        ],
+      });
+    if (!post) {
+      return res.status(404).json({
+        error: "Post not found",
+      });
+    }
+    res.status(200).json(post);
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 export const getLikedPosts = async (req, res) => {
   try {
     const { userName } = req.params;

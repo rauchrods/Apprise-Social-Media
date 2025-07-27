@@ -155,6 +155,13 @@ const Post = ({ post }) => {
     likePost();
   };
 
+  const handleSharePost = async () => {
+    const postUrl = `https://apprise.rauchrodrigues.in/post/${post._id}`;
+
+    await navigator.clipboard.writeText(postUrl);
+    toast.success("Post link copied to clipboard!");
+  };
+
   return (
     <div className="post-container">
       <div className="post-header">
@@ -277,9 +284,9 @@ const Post = ({ post }) => {
           <FaRegComment />
           <span>{post.comments.length}</span>
         </div>
-        <div className="share">
+        <div className="share" onClick={handleSharePost}>
           <BiRepost />
-          <span>0</span>
+          {/* <span>0</span> */}
         </div>
         <div className="like" onClick={handleLikePost}>
           {isLiking ? (

@@ -65,7 +65,7 @@ const LoginPage = () => {
     }
   };
 
-  console.log("formData: ", formData);
+ // console.log("formData: ", formData);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

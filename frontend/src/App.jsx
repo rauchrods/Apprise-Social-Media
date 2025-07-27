@@ -15,6 +15,7 @@ import SearchUsersPage from "./pages/searchUsers/SearchUsersPage";
 import { useDispatch } from "react-redux";
 import { setUser } from "./redux/features/authSlice";
 import SuggestedUsers from "./pages/SuggestedUsers/SuggestedUsers";
+import SharablePost from "./pages/post/SharablePost";
 
 function App() {
   const dispatch = useDispatch();
@@ -114,6 +115,14 @@ function App() {
           element={
             <ProtectedRoute authUser={authUser}>
               <SuggestedUsers />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/post/:id"
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <SharablePost />
             </ProtectedRoute>
           }
         />

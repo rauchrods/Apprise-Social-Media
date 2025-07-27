@@ -10,6 +10,7 @@ import { v2 as cloudinary } from "cloudinary";
 import path from "path";
 import { limiter } from "./middleware/rateLimiter.js";
 import { startKeepAlive } from "./lib/utils/serverKeepAlive.js";
+import helmet from "helmet";
 
 //this is required below for env to work
 dotenv.config();
@@ -26,6 +27,9 @@ const NODE_ENV = process.env.NODE_ENV;
 const app = express();
 
 const _dirname = path.resolve();
+
+// Security middleware
+app.use(helmet());
 
 //middleware below
 app.use(limiter);
@@ -45,6 +49,13 @@ app.use(
 //to parse cookies
 app.use(cookieParser());
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Apprise is running!",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 //authRoutes
 app.use("/api/auth", authRouter);
@@ -55,11 +66,12 @@ app.use("/api/posts", postRouter);
 //notificationRoutes
 app.use("/api/notifications", notificationRouter);
 
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Apprise is running!",
-    timestamp: new Date().toISOString(),
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'API endpoint not found',
+    message: `Route ${req.method} ${req.path} not found`
   });
 });
 
@@ -76,6 +88,6 @@ app.listen(port, () => {
 
   // Start the keep-alive cron job (only in production)
   if (NODE_ENV === "production") {
-    startKeepAlive();
+    // startKeepAlive();
   }
 });
