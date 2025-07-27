@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "./redux/features/authSlice";
 import SuggestedUsers from "./pages/SuggestedUsers/SuggestedUsers";
 import SharablePost from "./pages/post/SharablePost";
+import FollowersFollowing from "./pages/followers-following/FollowersFollowing";
 
 function App() {
   const dispatch = useDispatch();
@@ -123,6 +124,14 @@ function App() {
           element={
             <ProtectedRoute authUser={authUser}>
               <SharablePost />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/profile/:userName/connections/:type"
+          element={
+            <ProtectedRoute authUser={authUser}>
+              <FollowersFollowing />
             </ProtectedRoute>
           }
         />

@@ -4,7 +4,10 @@ export const getAllNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const notifications = await Notification.find({ to: userId })
+    const notifications = await Notification.find({
+      to: userId,
+      from: { $ne: userId }, // Exclude notifications from the user to themselves
+    })
       .sort({ createdAt: -1 })
       .populate({
         path: "from",

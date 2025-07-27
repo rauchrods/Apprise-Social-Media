@@ -135,10 +135,11 @@
     .follow-following-sec {
       display: flex;
       font-size: 0.9rem;
-      column-gap: 0.8rem;
+      column-gap: 1rem;
 
       .following-sec,
       .followers-sec {
+        cursor: pointer;
         display: flex;
         align-items: center;
         column-gap: 0.3rem;

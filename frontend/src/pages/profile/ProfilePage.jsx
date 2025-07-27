@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdVerified } from "react-icons/md";
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -26,6 +26,7 @@ const ProfilePage = () => {
   const [feedType, setFeedType] = useState("posts");
 
   const { userName } = useParams();
+  const navigate = useNavigate();
 
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
@@ -243,11 +244,21 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div className="follow-following-sec">
-                <div className="following-sec">
+                <div
+                  className="following-sec"
+                  onClick={() =>
+                    navigate(`/profile/${userName}/connections/following`)
+                  }
+                >
                   <span>{userProfile?.following.length}</span>
                   <span>Following</span>
                 </div>
-                <div className="followers-sec">
+                <div
+                  className="followers-sec"
+                  onClick={() =>
+                    navigate(`/profile/${userName}/connections/followers`)
+                  }
+                >
                   <span>{userProfile?.followers.length}</span>
                   <span>Followers</span>
                 </div>

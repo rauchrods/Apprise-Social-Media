@@ -101,6 +101,64 @@ export const getSearchedUsers = async (req, res) => {
   }
 };
 
+export const getFollowedFollowingUsers = async (req, res) => {
+  try {
+    const { type, userName } = req.query;
+
+    const authUser = req.user;
+
+    if (!type || !userName || (type !== "followers" && type !== "following")) {
+      return res.status(400).json({
+        error: "Invalid type",
+      });
+    }
+
+    const currentUser = await User.findOne({ userName: userName }).select(
+      "-password"
+    );
+    if (!currentUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    let users = [];
+
+    if (type === "followers") {
+      users = currentUser?.followers;
+    } else {
+      users = currentUser?.following;
+    }
+
+    if (!users || users.length === 0) {
+      return res.status(200).json({
+        responseUsers: [],
+        size: 0,
+      });
+    }
+
+    //exclude the auth user
+    const responseUsers = await User.find({
+      _id: { $in: users, $ne: authUser._id },
+    }).select([
+      "userName",
+      "fullName",
+      "profileImage",
+      "bio",
+      "isVerified",
+      "link",
+      "followers",
+      "following",
+    ]);
+    res.status(200).json({ responseUsers, size: responseUsers.length });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 export const followUnfollowUser = async (req, res) => {
   try {
     const { id } = req.params;
