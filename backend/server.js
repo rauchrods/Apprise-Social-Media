@@ -29,7 +29,16 @@ const app = express();
 const _dirname = path.resolve();
 
 // Security middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        // Production CSP rules
+        imgSrc: ["'self'", "data:", "*.cloudinary.com"],
+      },
+    },
+  })
+);
 
 //middleware below
 app.use(limiter);
@@ -67,11 +76,11 @@ app.use("/api/posts", postRouter);
 app.use("/api/notifications", notificationRouter);
 
 // 404 handler for API routes
-app.use('/api/*', (req, res) => {
+app.use("/api/*", (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'API endpoint not found',
-    message: `Route ${req.method} ${req.path} not found`
+    error: "API endpoint not found",
+    message: `Route ${req.method} ${req.path} not found`,
   });
 });
 
