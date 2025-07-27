@@ -101,18 +101,19 @@ export const validateOtpSignup = async (req, res) => {
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        userName: newUser.userName,
-        email: newUser.email,
-        followers: newUser.followers,
-        following: newUser.following,
-        profileImage: newUser.profileImage,
-        coverImage: newUser.coverImage,
-        bio: newUser.bio,
-        link: newUser.link,
-      });
+      // res.status(201).json({
+      //   _id: newUser._id,
+      //   fullName: newUser.fullName,
+      //   userName: newUser.userName,
+      //   email: newUser.email,
+      //   followers: newUser.followers,
+      //   following: newUser.following,
+      //   profileImage: newUser.profileImage,
+      //   coverImage: newUser.coverImage,
+      //   bio: newUser.bio,
+      //   link: newUser.link,
+      // });
+      return res.status(201).json({ message: "User Signed up successfully" });
     } else {
       return res.status(400).json({
         error: "Invalid user data",
@@ -216,18 +217,20 @@ export const validateOtplogin = async (req, res) => {
 
     generateTokenAndSetCookie(existingUser._id, res);
 
-    res.status(200).json({
-      _id: existingUser._id,
-      fullName: existingUser.fullName,
-      userName: existingUser.userName,
-      email: existingUser.email,
-      followers: existingUser.followers,
-      following: existingUser.following,
-      profileImage: existingUser.profileImage,
-      coverImage: existingUser.coverImage,
-      bio: existingUser.bio,
-      link: existingUser.link,
-    });
+    // res.status(200).json({
+    //   _id: existingUser._id,
+    //   fullName: existingUser.fullName,
+    //   userName: existingUser.userName,
+    //   email: existingUser.email,
+    //   followers: existingUser.followers,
+    //   following: existingUser.following,
+    //   profileImage: existingUser.profileImage,
+    //   coverImage: existingUser.coverImage,
+    //   bio: existingUser.bio,
+    //   link: existingUser.link,
+    // });
+
+    res.status(200).json({ message: "OTP validated successfully" });
   } catch (error) {
     console.log(`Error in login: ${error.message}`);
     return res.status(500).json({
