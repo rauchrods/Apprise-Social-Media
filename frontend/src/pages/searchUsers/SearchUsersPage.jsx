@@ -78,7 +78,7 @@ const SearchUsersPage = () => {
             onChange={(e) => debouncedNavigate(e.target.value)}
           />
         </div>
-        <div className="search-body">
+        <div className={`search-body${isLoading || isRefetching ? " body-loading" : ""}`}>
           {(isLoading || isRefetching) && <LoadingSpinner size={32} />}
           {!isLoading &&
             !isRefetching &&

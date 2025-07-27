@@ -13,4 +13,10 @@
   .search-body{
     margin-top: 1rem;
   }
+  .body-loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px
+  }
 }
