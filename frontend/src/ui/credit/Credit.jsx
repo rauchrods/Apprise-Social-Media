@@ -4,7 +4,7 @@ const Credit = ({ ...props }) => {
   return (
     <div className="credit-text" {...props}>
       <a
-        href={"https://rauchrodrigues.vercel.app/"}
+        href={"https://rauchrodrigues.in"}
         target="_blank"
         rel="noreferrer noopener"
       >
