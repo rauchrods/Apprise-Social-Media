@@ -17,6 +17,8 @@ const SuggestedUserCard = ({ user, isShowElipsis = true }) => {
   const iFollowing = authUser?.following.includes(user?._id);
   const { followUnfollow, isPending } = useFollow();
 
+  const isCurrentUser = authUser?._id === user?._id;
+
   const followUnfollowHandler = (e) => {
     e.preventDefault();
     followUnfollow({ id: user._id });
@@ -43,20 +45,22 @@ const SuggestedUserCard = ({ user, isShowElipsis = true }) => {
         </div>
       </div>
 
-      <Button
-        className="invert-btn"
-        onClick={followUnfollowHandler}
-        style={{ padding: "6px 8px" }}
-        disabled={isPending}
-      >
-        {isPending ? (
-          <LoadingSpinner size={16} />
-        ) : iFollowing ? (
-          "Unfollow"
-        ) : (
-          "Follow"
-        )}
-      </Button>
+      {isCurrentUser ? null : (
+        <Button
+          className="invert-btn"
+          onClick={followUnfollowHandler}
+          style={{ padding: "6px 8px" }}
+          disabled={isPending}
+        >
+          {isPending ? (
+            <LoadingSpinner size={16} />
+          ) : iFollowing ? (
+            "Unfollow"
+          ) : (
+            "Follow"
+          )}
+        </Button>
+      )}
     </div>
   );
 };

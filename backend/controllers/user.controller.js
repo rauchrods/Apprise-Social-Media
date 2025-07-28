@@ -139,7 +139,7 @@ export const getFollowedFollowingUsers = async (req, res) => {
 
     //exclude the auth user
     const responseUsers = await User.find({
-      _id: { $in: users, $ne: authUser._id },
+      _id: { $in: users },
     }).select([
       "userName",
       "fullName",
