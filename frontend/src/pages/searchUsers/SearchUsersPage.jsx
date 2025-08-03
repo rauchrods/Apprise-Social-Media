@@ -9,13 +9,16 @@ import SuggestedUserCard from "../../components/suggestedUserCard/SuggestedUserC
 import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
+import useFetch from "../../hooks/useFetch";
 
 const SearchUsersPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const searchQuery = searchParams.get("searchQuery");
+  let searchQuery = searchParams.get("searchQuery");
 
-//   console.log("searchQuery: ", searchQuery);
+  searchQuery = searchQuery ? searchQuery.trim() : "";
+
+  //   console.log("searchQuery: ", searchQuery);
 
   const debouncedNavigate = useCallback(
     debounce((value) => {
@@ -38,33 +41,11 @@ const SearchUsersPage = () => {
     data: searchedUsers,
     isLoading,
     error,
-    isError,
-    isRefetching,
-    refetch,
-  } = useQuery({
-    queryKey: ["searchedUsers"],
-    queryFn: async () => {
-      try {
-        const res = await fetch(`/api/users/search?searchQuery=${searchQuery}`);
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
+  } = useFetch(`/api/users/search?searchQuery=${searchQuery}`, {
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Search failed");
     },
   });
-
-  useEffect(() => {
-    refetch();
-  }, [searchQuery]);
 
   return (
     <PageLayout>
@@ -78,14 +59,12 @@ const SearchUsersPage = () => {
             onChange={(e) => debouncedNavigate(e.target.value)}
           />
         </div>
-        <div className={`search-body${isLoading || isRefetching ? " body-loading" : ""}`}>
-          {(isLoading || isRefetching) && <LoadingSpinner size={32} />}
+        <div className={`search-body${isLoading ? " body-loading" : ""}`}>
+          {isLoading && <LoadingSpinner size={32} />}
+          {!isLoading && searchedUsers && searchedUsers?.size === 0 && (
+            <p>No results found Search by Username or Full Name</p>
+          )}
           {!isLoading &&
-            !isRefetching &&
-            searchedUsers &&
-            searchedUsers?.size === 0 && <p>No results found Search by Username or Full Name</p>}
-          {!isLoading &&
-            !isRefetching &&
             searchedUsers &&
             searchedUsers?.users.map((user) => (
               <SuggestedUserCard

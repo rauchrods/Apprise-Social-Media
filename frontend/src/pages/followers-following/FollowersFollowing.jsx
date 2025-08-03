@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import SuggestedUserCard from "../../components/suggestedUserCard/SuggestedUserCard";
 import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinner";
 import { useParams } from "react-router-dom";
+import useFetch from "../../hooks/useFetch";
 
 const FollowersFollowing = () => {
   const { userName, type } = useParams();
@@ -14,32 +15,16 @@ const FollowersFollowing = () => {
     data: users,
     isLoading,
     error,
-    isError,
-    isRefetching,
-    refetch,
-  } = useQuery({
-    queryKey: ["myFollowedFollowingUsers"],
-    queryFn: async () => {
-      try {
-        const res = await fetch(
-          `/api/users/followed-following?type=${type}&userName=${userName}`
-        );
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.log("data: ", data);
-          toast.error(data?.error || "Something went wrong");
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-  });
-
-  console.log("users", users);
+  } = useFetch(
+    `/api/users/followed-following?type=${type}&userName=${userName}`,
+    {
+      dependencies: [type, userName], // Refetch when type or userName changes
+      enabled: !!(type && userName), // Only fetch when both params exist
+      onError: (error) => {
+        toast.error(error.message || "Something went wrong");
+      },
+    }
+  );
 
   return (
     <PageLayout>
@@ -47,20 +32,12 @@ const FollowersFollowing = () => {
         <div className="search-header">
           <h1>{type.toUpperCase() + ` (${userName}) `}</h1>
         </div>
-        <div
-          className={`search-body${
-            isLoading || isRefetching ? " body-loading" : ""
-          }`}
-        >
-          {(isLoading || isRefetching) && <LoadingSpinner size={32} />}
+        <div className={`search-body${isLoading ? " body-loading" : ""}`}>
+          {isLoading && <LoadingSpinner size={32} />}
+          {!isLoading && users && users?.responseUsers.length === 0 && (
+            <p>{type === "followers" ? "No Followers" : "No Followings"}</p>
+          )}
           {!isLoading &&
-            !isRefetching &&
-            users &&
-            users?.responseUsers.length === 0 && (
-              <p>{type === "followers" ? "No Followers" : "No Followings"}</p>
-            )}
-          {!isLoading &&
-            !isRefetching &&
             users &&
             users?.responseUsers.map((user) => (
               <SuggestedUserCard

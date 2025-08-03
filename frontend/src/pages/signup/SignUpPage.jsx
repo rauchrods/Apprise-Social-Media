@@ -8,16 +8,15 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import "./signUpPage.scss";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Credit from "../../ui/credit/Credit";
 import { trimObjectValues } from "../../utils/utilFunctions";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { useEffect } from "react";
+import useFetch from "../../hooks/useFetch";
 
-const SignUpPage = () => {
+const SignUpPage = ({ getAuthUser }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -62,83 +61,52 @@ const SignUpPage = () => {
   };
 
   const {
-    mutate: signUp,
-    isError,
-    error,
-    isPending,
-  } = useMutation({
-    mutationFn: async (formData) => {
-      try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        console.log(error);
-        // toast.error(error.message);
-        throw error;
-      }
-    },
+    execute: signUp,
+    isLoading: isSignupLoading,
+    error: signupError,
+  } = useFetch("/api/auth/signup", {
+    method: "POST",
     onSuccess: (data) => {
       console.log(data);
       toast.success("OTP Sent successfully!");
       setOtpSent(true);
       setTimeLeft(300); // 5 minutes = 300 seconds
-      // queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-  });
-
-  const { mutate: validateOtp, isPending: isValidatingOtp } = useMutation({
-    mutationFn: async (formData) => {
-      try {
-        const res = await fetch("/api/auth/validate-signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log(data);
-      toast.success("User Created Successfully!");
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to send OTP");
     },
   });
+
+  const { execute: validateOtp, isLoading: isValidatingOtp } = useFetch(
+    "/api/auth/validate-signup",
+    {
+      method: "POST",
+      onSuccess: (data) => {
+        console.log(data);
+        toast.success("User Created Successfully!");
+        getAuthUser(); // Refetch auth user data
+      },
+      onError: (error) => {
+        toast.error(error.message || "Invalid OTP");
+      },
+    }
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const trimmedData = trimObjectValues(formData);
 
-    if (!otpSent) {
-      signUp(trimObjectValues(formData));
-    } else {
-      validateOtp(trimObjectValues(formData));
+    try {
+      if (!otpSent) {
+        // Send OTP for signup
+        signUp(null, { body: trimmedData });
+      } else {
+        // Validate OTP and create account
+        validateOtp(null, { body: trimmedData });
+      }
+    } catch (error) {
+      // Errors are already handled by onError callbacks
+      console.error("Signup flow error:", error);
     }
   };
 
@@ -218,14 +186,17 @@ const SignUpPage = () => {
             </>
           )}
 
-          <Button className="auth-btn" disabled={isPending || isValidatingOtp}>
-            {isPending || isValidatingOtp
+          <Button
+            className="auth-btn"
+            disabled={isSignupLoading || isValidatingOtp}
+          >
+            {isSignupLoading || isValidatingOtp
               ? "Loading"
               : !otpSent
               ? "Sign Up"
               : "Submit Otp"}
           </Button>
-          {isError && <p className="error-msg">{error.message}</p>}
+          {signupError && <p className="error-msg">{signupError}</p>}
         </form>
         <div className="bottom-navigation">
           <p>Already have an account?</p>

@@ -6,15 +6,14 @@ import AppriseLogo from "../../components/appriseLogo/AppriseLogo";
 import Input from "../../ui/input/Input";
 import Button from "../../ui/button/Button";
 import "./loginPage.scss";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Credit from "../../ui/credit/Credit";
 import { trimObjectValues } from "../../utils/utilFunctions";
 import { useEffect } from "react";
+import useFetch from "../../hooks/useFetch";
 
-const LoginPage = () => {
+const LoginPage = ({ getAuthUser }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -59,89 +58,50 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!otpSent) {
-      logIn(trimObjectValues(formData));
+      logIn(null, { body: trimObjectValues(formData) });
     } else {
-      validateOtp(trimObjectValues(formData));
+      validateOtp(null, { body: trimObjectValues(formData) });
     }
   };
 
- // console.log("formData: ", formData);
+  // console.log("formData: ", formData);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const {
-    mutate: logIn,
-    isError,
-    error,
-    isPending,
-  } = useMutation({
-    mutationFn: async (formData) => {
-      try {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await res.json();
-
-        if (data?.error) throw new Error(data.error);
-
-        if(!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    },
+    execute: logIn,
+    isLoading: isPending,
+    error: loginError,
+  } = useFetch("/api/auth/login", {
+    method: "POST",
+    body: formData,
     onSuccess: (data) => {
-      // console.log(data);
+      //console.log(data);
       toast.success("OTP Sent successfully!");
       setOtpSent(true);
       setTimeLeft(300); // 5 minutes = 300 seconds
-      //queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-  });
-
-  const { mutate: validateOtp, isPending: isValidatingOtp } = useMutation({
-    mutationFn: async (formData) => {
-      try {
-        const res = await fetch("/api/auth/validate-login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log(data);
-      toast.success("LoggedIn Successfully!");
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
+
+  const { execute: validateOtp, isLoading: isValidatingOtp } = useFetch(
+    "/api/auth/validate-login",
+    {
+      method: "POST",
+      onSuccess: (data) => {
+        //console.log(data);
+        toast.success("LoggedIn Successfully!");
+        getAuthUser(); // Refetch auth user data
+      },
+      onError: (error) => {
+        toast.error(error.message || "Invalid OTP");
+      },
+    }
+  );
 
   return (
     <div className="log-in-page">
@@ -204,7 +164,7 @@ const LoginPage = () => {
           <Button className="auth-btn">
             {isPending ? "Loading" : "Login"}
           </Button>
-          {isError && <p className="error-msg">{error.message}</p>}
+          {loginError && <p className="error-msg">{loginError}</p>}
         </form>
         <div className="bottom-navigation">
           <p>Don't have an account?</p>

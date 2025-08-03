@@ -6,17 +6,16 @@ import { BiLogOut } from "react-icons/bi";
 import AppriseLogo from "../../appriseLogo/AppriseLogo";
 import "./sideBar.scss";
 import Avatar from "../../../ui/avatar/Avatar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/features/authSlice";
 import { useEffect, useState } from "react";
+import useFetch from "../../../hooks/useFetch";
 
 const Sidebar = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { user: authUser } = useSelector((state) => state.auth);
@@ -33,32 +32,32 @@ const Sidebar = () => {
     };
   }, []);
 
-  const { mutate } = useMutation({
-    mutationFn: async () => {
-      try {
-        const res = await fetch("/api/auth/logout", {
-          method: "POST",
-        });
-        const data = await res.json();
-        // console.log("data: ", data);
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
+  const { execute: logoutUser, isLoading: isLoggingOut } = useFetch(
+    "/api/auth/logout",
+    {
+      method: "POST",
+      onSuccess: () => {
+        toast.success("Logged Out successfully");
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error(error.message || "Logout failed");
+      },
+    }
+  );
 
-        return data;
-      } catch (error) {
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast.success("Logged Out successfully");
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-    onError: (error) => {
-      console.log(error);
-      toast.error(error.message);
-    },
-  });
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    if (isLoggingOut) return;
+
+    try {
+      dispatch(logout());
+      await logoutUser();
+    } catch (error) {
+      // Error already handled by onError callback
+      console.error("Logout failed:", error);
+    }
+  };
 
   const options = [
     {
@@ -128,14 +127,7 @@ const Sidebar = () => {
               </div>
             )}
           </div>
-          <div
-            className="right-sec"
-            onClick={(e) => {
-              e.preventDefault();
-              dispatch(logout());
-              mutate();
-            }}
-          >
+          <div className="right-sec" onClick={handleLogout}>
             <BiLogOut size={24} />
           </div>
         </div>

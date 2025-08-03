@@ -3,13 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import Post from "./Post";
 import "./posts.scss";
 import PostSkeleton from "./PostSkeleton";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
+import useFetch from "../../../hooks/useFetch";
 
 const Posts = ({ feedType }) => {
   const { userName } = useParams();
-  const getPostEndpoint = () => {
+  const getPostEndpoint = useCallback(() => {
     switch (feedType) {
       case "forYou":
         return "/api/posts/all";
@@ -22,7 +23,7 @@ const Posts = ({ feedType }) => {
       default:
         return "/api/posts/all";
     }
-  };
+  }, [feedType, userName]);
 
   const POST_ENDPOINT = getPostEndpoint();
 
@@ -30,23 +31,9 @@ const Posts = ({ feedType }) => {
     data: posts,
     isLoading,
     refetch,
-    isRefetching,
-  } = useQuery({
-    queryKey: ["posts"],
-    queryFn: async () => {
-      try {
-        const res = await fetch(POST_ENDPOINT);
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-        return data;
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
+  } = useFetch(POST_ENDPOINT, {
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     },
   });
 
@@ -54,22 +41,22 @@ const Posts = ({ feedType }) => {
 
   useEffect(() => {
     refetch();
-  }, [feedType, refetch, userName]);
+  }, [feedType, userName]);
 
   return (
     <>
-      {(isLoading || isRefetching) && (
+      {isLoading && (
         <div className="flex flex-col justify-center">
           <PostSkeleton />
           <PostSkeleton />
           <PostSkeleton />
         </div>
       )}
-      {!isLoading && !isRefetching && posts && posts.size === 0 && (
+      {!isLoading && posts && posts.size === 0 && (
         <p className="no-posts">No posts in this tab. Switch 👻</p>
       )}
 
-      {!isLoading && !isRefetching && posts && (
+      {!isLoading && posts && (
         <div className="display-posts">
           {posts.posts.map((post) => (
             <Post key={post._id} post={post} />

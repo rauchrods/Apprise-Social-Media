@@ -1,5 +1,5 @@
 import "./App.scss";
-import React from "react";
+import React, { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import SignUpPage from "./pages/signup/SignUpPage";
 import LoginPage from "./pages/login/LoginPage";
@@ -9,54 +9,42 @@ import RightPanel from "./components/rightPanel/RightPanel";
 import NotificationPage from "./pages/notification/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import toast, { Toaster } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/loadingSpinner/LoadingSpinner";
 import SearchUsersPage from "./pages/searchUsers/SearchUsersPage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./redux/features/authSlice";
 import SuggestedUsers from "./pages/SuggestedUsers/SuggestedUsers";
 import SharablePost from "./pages/post/SharablePost";
 import FollowersFollowing from "./pages/followers-following/FollowersFollowing";
+import useFetch from "./hooks/useFetch";
 
 function App() {
   const dispatch = useDispatch();
+  const [authChecked, setAuthChecked] = useState(false);
   const {
-    data: authUser,
+    data,
     isLoading,
     error,
-    isError,
-  } = useQuery({
-    queryKey: ["authUser"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/auth/me");
-        const data = await res.json();
-        if (data?.error) {
-          return null;
-        }
-        // console.log("Auth User: ", data);
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
+    refetch: getAuthUser,
+  } = useFetch("/api/auth/me", {
+    onSuccess: (data) => {
+      //console.log("Auth User: ", data);
+      if (data && !data.error) {
         dispatch(setUser(data));
-        return data;
-      } catch (error) {
-        throw new Error(error);
+        setAuthChecked(true);
       }
     },
-    onSuccess: (data) => {
-      console.log("Auth User on success: ", data);
-      dispatch(setUser(data));
+    onError: (err) => {
+      toast.error(err.message);
+      setAuthChecked(true);
     },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    // retry: false,
   });
+
+  const authUser = useSelector((state) => state.auth.user);
 
   // console.log("data:authUser ", authUser);
 
-  if (isLoading) {
+  if (isLoading || !authChecked) {
     return (
       <div className="loading-container">
         <LoadingSpinner />
@@ -65,12 +53,12 @@ function App() {
   }
 
   // Protected Route Component
-  const ProtectedRoute = React.memo(({ children, authUser }) => {
+  const ProtectedRoute = React.memo(({ children }) => {
     return authUser ? children : <Navigate to="/login" replace />;
   });
 
   // Public Route Component (for login/signup)
-  const PublicRoute = React.memo(({ children, authUser }) => {
+  const PublicRoute = React.memo(({ children }) => {
     return !authUser ? children : <Navigate to="/" replace />;
   });
 
@@ -82,7 +70,7 @@ function App() {
         <Route
           path="/"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <HomePage />
             </ProtectedRoute>
           }
@@ -90,7 +78,7 @@ function App() {
         <Route
           path="/notifications"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <NotificationPage />
             </ProtectedRoute>
           }
@@ -98,7 +86,7 @@ function App() {
         <Route
           path="/profile/:userName"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <ProfilePage />
             </ProtectedRoute>
           }
@@ -106,7 +94,7 @@ function App() {
         <Route
           path="/search"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <SearchUsersPage />
             </ProtectedRoute>
           }
@@ -114,23 +102,23 @@ function App() {
         <Route
           path="/suggested/users"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <SuggestedUsers />
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path="/post/:id"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <SharablePost />
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path="/profile/:userName/connections/:type"
           element={
-            <ProtectedRoute authUser={authUser}>
+            <ProtectedRoute>
               <FollowersFollowing />
             </ProtectedRoute>
           }
@@ -138,16 +126,16 @@ function App() {
         <Route
           path="/login"
           element={
-            <PublicRoute authUser={authUser}>
-              <LoginPage />
+            <PublicRoute>
+              <LoginPage getAuthUser={getAuthUser} />
             </PublicRoute>
           }
         />
         <Route
           path="/signup"
           element={
-            <PublicRoute authUser={authUser}>
-              <SignUpPage />
+            <PublicRoute>
+              <SignUpPage getAuthUser={getAuthUser} />
             </PublicRoute>
           }
         />

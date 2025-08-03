@@ -1,18 +1,15 @@
-import React from "react";
 import "./suggestedUserCard.scss";
 import Button from "../../ui/button/Button";
 import Avatar from "../../ui/avatar/Avatar";
 import { useNavigate } from "react-router-dom";
 import useFollow from "../../hooks/useFollow";
 import LoadingSpinner from "../common/loadingSpinner/LoadingSpinner";
-import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
 const SuggestedUserCard = ({ user, isShowElipsis = true }) => {
   const navigate = useNavigate();
 
-  const { data: authUser } = useQuery({
-    queryKey: ["authUser"],
-  });
+  const authUser = useSelector((state) => state.auth.user);
 
   const iFollowing = authUser?.following.includes(user?._id);
   const { followUnfollow, isPending } = useFollow();

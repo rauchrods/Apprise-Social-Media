@@ -7,57 +7,37 @@ import LoadingSpinner from "../../components/common/loadingSpinner/LoadingSpinne
 import Avatar from "../../ui/avatar/Avatar";
 import "./notificationPage.scss";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import useFetch from "../../hooks/useFetch";
 
 const NotificationPage = () => {
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const {
     data: notifications,
     isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/notifications/all");
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-        return data;
-      } catch (error) {
-        throw new Error(error);
-      }
+    error,
+    refetch,
+  } = useFetch("/api/notifications/all", {
+    onError: (err) => {
+      toast.error(err.message || "Failed to fetch notifications");
     },
   });
 
-  const { mutate: deleteAll, isPending } = useMutation({
-    mutationFn: async () => {
-      try {
-        const res = await fetch("/api/notifications/all", {
-          method: "DELETE",
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Something went wrong");
-        }
-        return data;
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-    onSuccess: () => {
-      toast.success("All notifications deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const { execute: deleteAll, isLoading: isDeleteAllLoading } = useFetch(
+    "/api/notifications/all",
+    {
+      method: "DELETE",
+      onSuccess: () => {
+        toast.success("All notifications deleted successfully");
+        refetch(); // Refetch notifications after deletion
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to delete notifications");
+      },
+    }
+  );
 
   //  console.log("notifications: ", notifications);
 
@@ -65,9 +45,13 @@ const NotificationPage = () => {
     setOpen((currState) => !currState);
   };
 
-  const deleteAllNotifications = () => {
+  const deleteAllNotifications = async () => {
     setOpen(false);
-    deleteAll();
+    try {
+      await deleteAll(); // Execute the DELETE request
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   return (
@@ -87,7 +71,7 @@ const NotificationPage = () => {
             )}
           </div>
         </div>
-        {(isLoading || isPending) && <LoadingSpinner size={"40"} />}
+        {(isLoading || isDeleteAllLoading) && <LoadingSpinner size={"40"} />}
         {!isLoading && notifications && notifications?.size === 0 && (
           <div className="no-notification">No notifications 🤔</div>
         )}
