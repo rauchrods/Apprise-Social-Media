@@ -41,7 +41,10 @@ app.use(
 );
 
 //middleware below
-app.use(limiter);
+if (NODE_ENV === "production") {
+  app.use(limiter);
+}
+
 //to parse req.body as json
 app.use(
   express.json({
